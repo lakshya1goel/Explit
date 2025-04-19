@@ -6,27 +6,20 @@ import theme from '../../styles/theme';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../types';
 
-const SignUpScreen = () => {
+const ResetPasswordScreen = () => {
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
     return (
         <View style={styles.container}>
-            <Text style={styles.heading}>Sign Up</Text>
+            <Text style={styles.heading}>Reset Password</Text>
             <Image source={require('../../../assets/images/explit_logo.png')} style={styles.logo} />
             <View style={styles.inputContainer}>
-                <TextInput placeholder="Email" placeholderTextColor="#ABB5B5"/>
-            </View>
-            <View style={styles.inputContainer}>
-                <TextInput placeholder="Password" placeholderTextColor="#ABB5B5"/>
+                <TextInput placeholder=" Reset Password" placeholderTextColor="#ABB5B5"/>
             </View>
             <View style={styles.inputContainer}>
                 <TextInput placeholder="Confirm Password" placeholderTextColor="#ABB5B5"/>
             </View>
             <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('VerifyOtp')}>
-                <Text>Get Otp</Text>
-            </TouchableOpacity>
-            <Text style={styles.accountText}>Already have an account ?</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-                <Text style={styles.loginText}>Login</Text>
+                <Text>Login</Text>
             </TouchableOpacity>
         </View>
     );
@@ -62,19 +55,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingVertical: 8,
         borderRadius: 4,
-    },
-    accountText: {
-        color: theme.colors.secondary[400],
-        marginTop: 25,
-        marginBottom: 10,
-        fontSize: 16,
-        fontWeight: '400',
-    },
-    loginText: {
-        color: theme.colors.primary[500],
-        fontSize: 14,
-        lineHeight: 20,
-        letterSpacing: 0.02,
+        marginTop: 50,
     },
 });
-export default SignUpScreen;
+export default ResetPasswordScreen;

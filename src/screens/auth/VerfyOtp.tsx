@@ -3,8 +3,11 @@ import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { StyleSheet } from 'react-native';
 import theme from '../../styles/theme';
 import { TextInput } from 'react-native-gesture-handler';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { RootStackParamList } from '../../types';
 
 const VerifyOtpScreen = () => {
+    const navigation = useNavigation<NavigationProp<RootStackParamList>>();
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const inputRefs = useRef<Array<TextInput | null>>(new Array(6).fill(null));
 
@@ -50,7 +53,7 @@ const VerifyOtpScreen = () => {
             <Text style={styles.text}>An OTP is send to your e-mail.</Text>
             <Text style={styles.text}>Didn’t receive an OTP ? </Text>
             <Text style={styles.text}>Resend in 5:00 mins</Text>
-            <TouchableOpacity style={styles.button}>
+            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ResetPassword')}>
                 <Text>Sign Up</Text>
             </TouchableOpacity>
         </View>

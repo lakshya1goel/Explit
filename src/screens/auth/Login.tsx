@@ -26,7 +26,7 @@ const LoginScreen = () => {
             </TouchableOpacity>
             <Text style={styles.accountText}>Don’t have an account ?</Text>
             <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-                <Text style={styles.logonText}>Sign Up</Text>
+                <Text style={styles.loginText}>Sign Up</Text>
             </TouchableOpacity>
         </View>
     );
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '400',
     },
-    logonText: {
+    loginText: {
         color: theme.colors.primary[500],
         fontSize: 14,
         lineHeight: 20,
