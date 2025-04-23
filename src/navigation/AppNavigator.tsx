@@ -6,6 +6,7 @@ import SignUpScreen from '../screens/auth/SignUp';
 import LoginScreen from '../screens/auth/Login';
 import VerifyOtpScreen from '../screens/auth/VerfyOtp';
 import ResetPasswordScreen from '../screens/auth/ResetPassword';
+import HomeScreen from '../screens/Home';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -17,6 +18,7 @@ const AppNavigator = () => {
                 <Stack.Screen name="SignUp" component={SignUpScreen} />
                 <Stack.Screen name="VerifyOtp" component={VerifyOtpScreen} />
                 <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
+                <Stack.Screen name="Home" component={HomeScreen} />
             </Stack.Navigator>
         </NavigationContainer>
     );

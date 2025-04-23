@@ -21,7 +21,7 @@ const LoginScreen = () => {
             <TouchableOpacity style={styles.forotButton} onPress={() => navigation.navigate('VerifyOtp')}>
                 <Text style={styles.forgotText}>Forgot Password ?</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button}>
+            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Home')}>
                 <Text>Login</Text>
             </TouchableOpacity>
             <Text style={styles.accountText}>Don’t have an account ?</Text>
