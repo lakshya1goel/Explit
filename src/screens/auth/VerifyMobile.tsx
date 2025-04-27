@@ -8,24 +8,25 @@ import { RootStackParamList } from '../../types';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store';
 import Snackbar from 'react-native-snackbar';
-import { verifyEmail } from '../../store/slices/authSlice';
+import { verifyMobile } from '../../store/slices/authSlice';
 
-const VerifyMailScreen = () => {
+const VerifyMobileScreen = () => {
     const route = useRoute<RouteProp<RootStackParamList, 'VerifyMail'>>();
-    const {email, mobile} = route.params;
+    const {mobile} = route.params;
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
     const dispatch = useDispatch<AppDispatch>();
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const inputRefs = useRef<Array<TextInput | null>>(new Array(6).fill(null));
 
-    const { loading, isEmailVerified } = useSelector((state: RootState) => state.auth);
+    const { loading, isMobileVerified } = useSelector((state: RootState) => state.auth);
+    console.log(mobile);
 
     useEffect(() => {
-        if (isEmailVerified) {
-            showSuccessMessage('Email Verified!');
-            navigation.navigate('VerifyMobile', {mobile: mobile});
+        if (isMobileVerified) {
+            showSuccessMessage('Mobile Verified!');
+            navigation.navigate('Home');
         }
-    }, [isEmailVerified, navigation, mobile]);
+    }, [isMobileVerified, navigation]);
 
     const showSuccessMessage = (message: string) => {
         Snackbar.show({
@@ -43,14 +44,15 @@ const VerifyMailScreen = () => {
         });
     };
 
-    const handleVerifyEmail = async () => {
+    const handleVerifyMobile = async () => {
         try {
             const otpString = otp.join('');
             if (otpString.length !== 6) {
                 showErrorMessage('Please enter complete OTP');
                 return;
             }
-            await dispatch(verifyEmail({ email: email, otp: otpString })).unwrap();
+
+            await dispatch(verifyMobile({ mobile, otp: otpString })).unwrap();
         } catch (err) {
             if (typeof err === 'string') {
                 showErrorMessage(err);
@@ -81,7 +83,7 @@ const VerifyMailScreen = () => {
     };
     return (
         <View style={styles.container}>
-            <Text style={styles.heading}>Verify Mail</Text>
+            <Text style={styles.heading}>Verify Mobile Number</Text>
             <Image source={require('../../../assets/images/explit_logo.png')} style={styles.logo} />
             <View style={styles.otpContainer}>
                 {otp.map((digit, index) => (
@@ -106,7 +108,7 @@ const VerifyMailScreen = () => {
             <Text style={styles.text}>Resend in 5:00 mins</Text> */}
             <TouchableOpacity style={styles.button}
             onPress={async () => {
-                await handleVerifyEmail();
+                await handleVerifyMobile();
                 Keyboard.dismiss();
             }}
             disabled={loading}>
@@ -170,4 +172,4 @@ const styles = StyleSheet.create({
         fontWeight: '400',
     },
 });
-export default VerifyMailScreen;
+export default VerifyMobileScreen;

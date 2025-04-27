@@ -92,9 +92,9 @@ const LoginScreen = () => {
                 onChangeText={(text) => setCredentials({ ...credentials, password: text })}
                 style={{color: '#ffffff'}}/>
             </View>
-            <TouchableOpacity style={styles.forotButton} onPress={() => navigation.navigate('VerifyMail')}>
+            {/* <TouchableOpacity style={styles.forotButton} onPress={() => navigation.navigate('VerifyMail')}>
                 <Text style={styles.forgotText}>Forgot Password ?</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             <TouchableOpacity
                 style={styles.button}
                 onPress={async () => {

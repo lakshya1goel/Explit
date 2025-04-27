@@ -80,7 +80,7 @@ export const verifyEmail = createAsyncThunk<AuthResponse, VerifyEmailCredentials
   'auth/verify-email',
   async (credentials, { rejectWithValue }) => {
     try {
-      const response = await api.post<AuthResponse>('auth/verify-email', credentials);
+      const response = await api.post<AuthResponse>('auth/verify-mail', credentials);
 
       if (response.data.success) {
         return response.data;
@@ -128,6 +128,8 @@ const initialState: AuthState = {
   refreshToken: null,
   loading: false,
   error: null,
+  isEmailVerified: false,
+  isMobileVerified: false,
 };
 
 const authSlice = createSlice({
@@ -162,6 +164,24 @@ const authSlice = createSlice({
     }).addCase(register.rejected, (state, action) =>{
       state.loading = false;
       state.error = action.payload || 'Register Failed';
+    }).addCase(verifyEmail.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    }).addCase(verifyEmail.fulfilled, (state) => {
+      state.loading = false;
+      state.isEmailVerified = true;
+    }).addCase(verifyEmail.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload || 'Email Verification Failed';
+    }).addCase(verifyMobile.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    }).addCase(verifyMobile.fulfilled, (state) => {
+      state.loading = false;
+      state.isEmailVerified = true;
+    }).addCase(verifyMobile.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload || 'Mobile Verification Failed';
     });
   },
 });

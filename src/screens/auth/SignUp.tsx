@@ -13,6 +13,8 @@ import { register } from '../../store/slices/authSlice';
 const SignUpScreen = () => {
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
     const dispatch = useDispatch<AppDispatch>();
+    const sendEmail = React.useRef<string>('');
+    const sendMobile = React.useRef<string>('');
     const [credentials, setCredentials] = React.useState({
         email: '',
         mobile: '',
@@ -25,9 +27,9 @@ const SignUpScreen = () => {
     useEffect(() => {
         if (isOtpSent) {
             showSuccessMessage('Registration Successful, please verify!');
-            navigation.navigate('VerifyMail');
+            navigation.navigate('VerifyMail', {email: sendEmail.current, mobile: sendMobile.current});
         }
-    }, [isOtpSent, navigation]);
+    }, [isOtpSent, navigation, sendEmail, sendMobile]);
 
     const showSuccessMessage = (message: string) => {
         Snackbar.show({
@@ -122,6 +124,8 @@ const SignUpScreen = () => {
             </View>
             <TouchableOpacity style={styles.button}
             onPress={async () => {
+                sendEmail.current = credentials.email;
+                sendMobile.current = credentials.mobile;
                 await handleRegister();
                 setCredentials({ email: '', mobile: '', password: '', confirm_password: '' });
                 Keyboard.dismiss();

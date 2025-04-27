@@ -1,8 +1,13 @@
 export type RootStackParamList = {
     Login: undefined;
     SignUp: undefined;
-    VerifyMail: undefined;
-    VerifyMobile: undefined;
+    VerifyMail: {
+        email: string;
+        mobile: string;
+    };
+    VerifyMobile: {
+        mobile: string;
+    };
     ResetPassword: undefined;
     Home: undefined;
 }
