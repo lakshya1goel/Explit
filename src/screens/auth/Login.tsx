@@ -1,28 +1,114 @@
-import React from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect } from 'react';
+import { ActivityIndicator, Image, Keyboard, Text, TouchableOpacity, View } from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
 import { StyleSheet } from 'react-native';
 import theme from '../../styles/theme';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../types';
+import { useDispatch, useSelector } from 'react-redux';
+import Snackbar from 'react-native-snackbar';
+import { login } from '../../store/slices/authSlice';
+import { AppDispatch, RootState } from '../../store';
 
 const LoginScreen = () => {
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+    const dispatch = useDispatch<AppDispatch>();
+    const [credentials, setCredentials] = React.useState({
+        email: '',
+        password: '',
+    });
+
+    const { loading, isAuthenticated } = useSelector((state: RootState) => state.auth);
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            showSuccessMessage('Login Successful!');
+            navigation.navigate('Home');
+        }
+    }, [isAuthenticated, navigation]);
+
+    const showSuccessMessage = (message: string) => {
+        Snackbar.show({
+            text: message,
+            duration: Snackbar.LENGTH_SHORT,
+            backgroundColor: 'green',
+        });
+    };
+
+    const showErrorMessage = (message: string) => {
+        Snackbar.show({
+            text: message,
+            duration: Snackbar.LENGTH_SHORT,
+            backgroundColor: 'red',
+        });
+    };
+
+    const validateForm = (): boolean => {
+        if (!credentials.email || !credentials.password) {
+            showErrorMessage('Please enter both email and password');
+            return false;
+        }
+        if (!credentials.email.includes('@')) {
+            showErrorMessage('Please enter a valid email');
+            return false;
+        }
+        if (credentials.password.length < 6) {
+            showErrorMessage('Password must be at least 6 characters');
+            return false;
+        }
+        return true;
+    };
+
+    const handleLogin = async () => {
+        try {
+            if (!validateForm()) {return;}
+            await dispatch(login(credentials)).unwrap();
+        } catch (err) {
+            if (typeof err === 'string') {
+                showErrorMessage(err);
+            } else if (err instanceof Error) {
+                showErrorMessage(err.message);
+            } else {
+                showErrorMessage('Login failed');
+            }
+        }
+    };
+
     return (
         <View style={styles.container}>
             <Text style={styles.heading}>Login</Text>
             <Image source={require('../../../assets/images/explit_logo.png')} style={styles.logo} />
             <View style={styles.inputContainer}>
-                <TextInput placeholder="Email" placeholderTextColor="#ABB5B5"/>
+                <TextInput placeholder="Email"
+                placeholderTextColor="#ABB5B5"
+                value={credentials.email}
+                onChangeText={(text) => setCredentials({ ...credentials, email: text })}
+                style={{color: '#ffffff'}}/>
             </View>
             <View style={styles.inputContainer}>
-                <TextInput placeholder="Password" placeholderTextColor="#ABB5B5"/>
+                <TextInput placeholder="Password"
+                placeholderTextColor="#ABB5B5"
+                value={credentials.password}
+                onChangeText={(text) => setCredentials({ ...credentials, password: text })}
+                style={{color: '#ffffff'}}/>
             </View>
-            <TouchableOpacity style={styles.forotButton} onPress={() => navigation.navigate('VerifyOtp')}>
+            {/* <TouchableOpacity style={styles.forotButton} onPress={() => navigation.navigate('VerifyMail')}>
                 <Text style={styles.forgotText}>Forgot Password ?</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Home')}>
+            </TouchableOpacity> */}
+            <TouchableOpacity
+                style={styles.button}
+                onPress={async () => {
+                    await handleLogin();
+                    setCredentials({ email: '', password: '' });
+                    Keyboard.dismiss();
+                }}
+                disabled={loading}
+            >
+            {loading ? (
+                <ActivityIndicator color="#fff" />
+            ) : (
                 <Text>Login</Text>
+            )}
             </TouchableOpacity>
             <Text style={styles.accountText}>Don’t have an account ?</Text>
             <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>

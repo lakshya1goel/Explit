@@ -1,28 +1,141 @@
-import React from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect } from 'react';
+import { ActivityIndicator, Image, Keyboard, Text, TouchableOpacity, View } from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
 import { StyleSheet } from 'react-native';
 import theme from '../../styles/theme';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../types';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../store';
+import Snackbar from 'react-native-snackbar';
+import { register } from '../../store/slices/authSlice';
 
 const SignUpScreen = () => {
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+    const dispatch = useDispatch<AppDispatch>();
+    const sendEmail = React.useRef<string>('');
+    const sendMobile = React.useRef<string>('');
+    const [credentials, setCredentials] = React.useState({
+        email: '',
+        mobile: '',
+        password: '',
+        confirm_password: '',
+    });
+
+    const { loading, isOtpSent } = useSelector((state: RootState) => state.auth);
+
+    useEffect(() => {
+        if (isOtpSent) {
+            showSuccessMessage('Registration Successful, please verify!');
+            navigation.navigate('VerifyMail', {email: sendEmail.current, mobile: sendMobile.current});
+        }
+    }, [isOtpSent, navigation, sendEmail, sendMobile]);
+
+    const showSuccessMessage = (message: string) => {
+        Snackbar.show({
+            text: message,
+            duration: Snackbar.LENGTH_SHORT,
+            backgroundColor: 'green',
+        });
+    };
+
+    const showErrorMessage = (message: string) => {
+        Snackbar.show({
+            text: message,
+            duration: Snackbar.LENGTH_SHORT,
+            backgroundColor: 'red',
+        });
+    };
+
+    const validateForm = (): boolean => {
+        if (!credentials.email || !credentials.mobile || !credentials.password || !credentials.confirm_password) {
+            showErrorMessage('All fields are required');
+            return false;
+        }
+        if (!credentials.email.includes('@')) {
+            showErrorMessage('Please enter a valid email');
+            return false;
+        }
+        if (!/^\d+$/.test(credentials.mobile)) {
+            showErrorMessage('Mobile number must be numeric');
+            return false;
+        }
+        if (credentials.mobile.length !== 10) {
+            showErrorMessage('Mobile number must be of 10 digits');
+            return false;
+        }
+        if (credentials.password.length < 6) {
+            showErrorMessage('Password must be at least 6 characters');
+            return false;
+        }
+        if (credentials.password !== credentials.confirm_password) {
+            showErrorMessage('Passwords do not match');
+            return false;
+        }
+        return true;
+    };
+
+    const handleRegister = async () => {
+        try {
+            if (!validateForm()) {return;}
+            await dispatch(register(credentials)).unwrap();
+        } catch (err) {
+            if (typeof err === 'string') {
+                showErrorMessage(err);
+            } else if (err instanceof Error) {
+                showErrorMessage(err.message);
+            } else {
+                showErrorMessage('Login failed');
+            }
+        }
+    };
+
     return (
         <View style={styles.container}>
             <Text style={styles.heading}>Sign Up</Text>
             <Image source={require('../../../assets/images/explit_logo.png')} style={styles.logo} />
             <View style={styles.inputContainer}>
-                <TextInput placeholder="Email" placeholderTextColor="#ABB5B5"/>
+                <TextInput placeholder="Email"
+                placeholderTextColor="#ABB5B5"
+                value={credentials.email}
+                onChangeText={(text) => setCredentials({ ...credentials, email: text })}
+                style={{color: '#ffffff'}}/>
             </View>
             <View style={styles.inputContainer}>
-                <TextInput placeholder="Password" placeholderTextColor="#ABB5B5"/>
+                <TextInput placeholder="Mobile No."
+                placeholderTextColor="#ABB5B5"
+                value={credentials.mobile}
+                onChangeText={(text) => setCredentials({ ...credentials, mobile: text })}
+                style={{color: '#ffffff'}}/>
             </View>
             <View style={styles.inputContainer}>
-                <TextInput placeholder="Confirm Password" placeholderTextColor="#ABB5B5"/>
+                <TextInput placeholder="Password"
+                placeholderTextColor="#ABB5B5"
+                value={credentials.password}
+                onChangeText={(text) => setCredentials({ ...credentials, password: text })}
+                style={{color: '#ffffff'}}/>
             </View>
-            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('VerifyOtp')}>
-                <Text>Get Otp</Text>
+            <View style={styles.inputContainer}>
+                <TextInput placeholder="Confirm Password"
+                placeholderTextColor="#ABB5B5"
+                value={credentials.confirm_password}
+                onChangeText={(text) => setCredentials({ ...credentials, confirm_password: text })}
+                style={{color: '#ffffff'}}/>
+            </View>
+            <TouchableOpacity style={styles.button}
+            onPress={async () => {
+                sendEmail.current = credentials.email;
+                sendMobile.current = credentials.mobile;
+                await handleRegister();
+                setCredentials({ email: '', mobile: '', password: '', confirm_password: '' });
+                Keyboard.dismiss();
+            }}
+            disabled={loading}>
+                {loading ? (
+                    <ActivityIndicator color="#fff" />
+                ) : (
+                    <Text>Get OTPs</Text>
+                )}
             </TouchableOpacity>
             <Text style={styles.accountText}>Already have an account ?</Text>
             <TouchableOpacity onPress={() => navigation.navigate('Login')}>

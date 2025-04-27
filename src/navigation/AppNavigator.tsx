@@ -4,9 +4,10 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { RootStackParamList } from '../types';
 import SignUpScreen from '../screens/auth/SignUp';
 import LoginScreen from '../screens/auth/Login';
-import VerifyOtpScreen from '../screens/auth/VerfyOtp';
+import VerifyMailScreen from '../screens/auth/VerfyMail';
 import ResetPasswordScreen from '../screens/auth/ResetPassword';
 import HomeScreen from '../screens/Home';
+import VerifyMobileScreen from '../screens/auth/VerifyMobile';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -16,7 +17,8 @@ const AppNavigator = () => {
             <Stack.Navigator screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="Login" component={LoginScreen} />
                 <Stack.Screen name="SignUp" component={SignUpScreen} />
-                <Stack.Screen name="VerifyOtp" component={VerifyOtpScreen} />
+                <Stack.Screen name="VerifyMail" component={VerifyMailScreen} />
+                <Stack.Screen name="VerifyMobile" component={VerifyMobileScreen} />
                 <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
                 <Stack.Screen name="Home" component={HomeScreen} />
             </Stack.Navigator>

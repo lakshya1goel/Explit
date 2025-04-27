@@ -1,15 +1,68 @@
-import React, { useRef, useState } from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Image, Keyboard, Text, TouchableOpacity, View } from 'react-native';
 import { StyleSheet } from 'react-native';
 import theme from '../../styles/theme';
 import { TextInput } from 'react-native-gesture-handler';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { NavigationProp, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { RootStackParamList } from '../../types';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../store';
+import Snackbar from 'react-native-snackbar';
+import { verifyMobile } from '../../store/slices/authSlice';
 
-const VerifyOtpScreen = () => {
+const VerifyMobileScreen = () => {
+    const route = useRoute<RouteProp<RootStackParamList, 'VerifyMail'>>();
+    const {mobile} = route.params;
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+    const dispatch = useDispatch<AppDispatch>();
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const inputRefs = useRef<Array<TextInput | null>>(new Array(6).fill(null));
+
+    const { loading, isMobileVerified } = useSelector((state: RootState) => state.auth);
+    console.log(mobile);
+
+    useEffect(() => {
+        if (isMobileVerified) {
+            showSuccessMessage('Mobile Verified!');
+            navigation.navigate('Home');
+        }
+    }, [isMobileVerified, navigation]);
+
+    const showSuccessMessage = (message: string) => {
+        Snackbar.show({
+            text: message,
+            duration: Snackbar.LENGTH_SHORT,
+            backgroundColor: 'green',
+        });
+    };
+
+    const showErrorMessage = (message: string) => {
+        Snackbar.show({
+            text: message,
+            duration: Snackbar.LENGTH_SHORT,
+            backgroundColor: 'red',
+        });
+    };
+
+    const handleVerifyMobile = async () => {
+        try {
+            const otpString = otp.join('');
+            if (otpString.length !== 6) {
+                showErrorMessage('Please enter complete OTP');
+                return;
+            }
+
+            await dispatch(verifyMobile({ mobile, otp: otpString })).unwrap();
+        } catch (err) {
+            if (typeof err === 'string') {
+                showErrorMessage(err);
+            } else if (err instanceof Error) {
+                showErrorMessage(err.message);
+            } else {
+                showErrorMessage('Verification failed');
+            }
+        }
+    };
 
     const handleOtpChange = (value: string, index: number) => {
         if (value.length <= 1) {
@@ -30,7 +83,7 @@ const VerifyOtpScreen = () => {
     };
     return (
         <View style={styles.container}>
-            <Text style={styles.heading}>Verify OTP</Text>
+            <Text style={styles.heading}>Verify Mobile Number</Text>
             <Image source={require('../../../assets/images/explit_logo.png')} style={styles.logo} />
             <View style={styles.otpContainer}>
                 {otp.map((digit, index) => (
@@ -51,10 +104,19 @@ const VerifyOtpScreen = () => {
                 ))}
             </View>
             <Text style={styles.text}>An OTP is send to your e-mail.</Text>
-            <Text style={styles.text}>Didn’t receive an OTP ? </Text>
-            <Text style={styles.text}>Resend in 5:00 mins</Text>
-            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ResetPassword')}>
-                <Text>Sign Up</Text>
+            {/* <Text style={styles.text}>Didn’t receive an OTP ? </Text>
+            <Text style={styles.text}>Resend in 5:00 mins</Text> */}
+            <TouchableOpacity style={styles.button}
+            onPress={async () => {
+                await handleVerifyMobile();
+                Keyboard.dismiss();
+            }}
+            disabled={loading}>
+            {loading ? (
+                <ActivityIndicator color="#fff" />
+            ) : (
+                <Text>Verify</Text>
+            )}
             </TouchableOpacity>
         </View>
     );
@@ -110,4 +172,4 @@ const styles = StyleSheet.create({
         fontWeight: '400',
     },
 });
-export default VerifyOtpScreen;
+export default VerifyMobileScreen;
