@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { AuthResponse, AuthState, LoginCredentials } from '../types';
+import { AuthResponse, AuthState, LoginCredentials, OtpCredentials, OtpResponse, RegisterCredentials, VerifyEmailCredentials, VerifyMobileCredentials } from '../types';
 import axios, { AxiosError } from 'axios';
 import { BASE_URL } from '@env';
 
@@ -32,8 +32,97 @@ export const login = createAsyncThunk<AuthResponse, LoginCredentials, { rejectVa
   }
 );
 
+export const register = createAsyncThunk<OtpResponse, RegisterCredentials, { rejectValue: string }>(
+  'auth/register',
+  async (credentials, { rejectWithValue }) => {
+    try {
+      const response = await api.post<AuthResponse>('auth/register', credentials);
+
+      if (response.data.success) {
+        return response.data;
+      }
+
+      return rejectWithValue(response.data.message);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue(
+          error.response?.data?.message
+        );
+      }
+      return rejectWithValue('An unexpected error occurred');
+    }
+  }
+);
+
+export const sendOtp = createAsyncThunk<OtpResponse, OtpCredentials, { rejectValue: string }>(
+  'auth/send-otp',
+  async (credentials, { rejectWithValue }) => {
+    try {
+      const response = await api.post<OtpResponse>('auth/send-otp', credentials);
+
+      if (response.data.success) {
+        return response.data;
+      }
+
+      return rejectWithValue(response.data.message);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue(
+          error.response?.data?.message
+        );
+      }
+      return rejectWithValue('An unexpected error occurred');
+    }
+  }
+);
+
+export const verifyEmail = createAsyncThunk<AuthResponse, VerifyEmailCredentials, { rejectValue: string }>(
+  'auth/verify-email',
+  async (credentials, { rejectWithValue }) => {
+    try {
+      const response = await api.post<AuthResponse>('auth/verify-email', credentials);
+
+      if (response.data.success) {
+        return response.data;
+      }
+
+      return rejectWithValue(response.data.message);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue(
+          error.response?.data?.message
+        );
+      }
+      return rejectWithValue('An unexpected error occurred');
+    }
+  }
+);
+
+export const verifyMobile = createAsyncThunk<AuthResponse, VerifyMobileCredentials, { rejectValue: string }>(
+  'auth/verify-mobile',
+  async (credentials, { rejectWithValue }) => {
+    try {
+      const response = await api.post<AuthResponse>('auth/verify-mobile', credentials);
+
+      if (response.data.success) {
+        return response.data;
+      }
+
+      return rejectWithValue(response.data.message);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue(
+          error.response?.data?.message
+        );
+      }
+      return rejectWithValue('An unexpected error occurred');
+    }
+  }
+);
+
 const initialState: AuthState = {
   isAuthenticated: false,
+  isOtpSent: false,
   user: null,
   accessToken: null,
   refreshToken: null,
@@ -64,6 +153,15 @@ const authSlice = createSlice({
     }).addCase(login.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload || 'Login Failed';
+    }).addCase(register.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    }).addCase(register.fulfilled, (state) => {
+      state.loading = false;
+      state.isOtpSent = true;
+    }).addCase(register.rejected, (state, action) =>{
+      state.loading = false;
+      state.error = action.payload || 'Register Failed';
     });
   },
 });

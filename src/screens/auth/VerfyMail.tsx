@@ -6,7 +6,7 @@ import { TextInput } from 'react-native-gesture-handler';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../types';
 
-const VerifyOtpScreen = () => {
+const VerifyMailScreen = () => {
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const inputRefs = useRef<Array<TextInput | null>>(new Array(6).fill(null));
@@ -30,7 +30,7 @@ const VerifyOtpScreen = () => {
     };
     return (
         <View style={styles.container}>
-            <Text style={styles.heading}>Verify OTP</Text>
+            <Text style={styles.heading}>Verify Mail</Text>
             <Image source={require('../../../assets/images/explit_logo.png')} style={styles.logo} />
             <View style={styles.otpContainer}>
                 {otp.map((digit, index) => (
@@ -51,8 +51,8 @@ const VerifyOtpScreen = () => {
                 ))}
             </View>
             <Text style={styles.text}>An OTP is send to your e-mail.</Text>
-            <Text style={styles.text}>Didn’t receive an OTP ? </Text>
-            <Text style={styles.text}>Resend in 5:00 mins</Text>
+            {/* <Text style={styles.text}>Didn’t receive an OTP ? </Text>
+            <Text style={styles.text}>Resend in 5:00 mins</Text> */}
             <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ResetPassword')}>
                 <Text>Sign Up</Text>
             </TouchableOpacity>
@@ -110,4 +110,4 @@ const styles = StyleSheet.create({
         fontWeight: '400',
     },
 });
-export default VerifyOtpScreen;
+export default VerifyMailScreen;
