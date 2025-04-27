@@ -31,6 +31,7 @@ const requestContactPermission = async () => {
         if (res === PermissionsAndroid.RESULTS.GRANTED) {
             const contacts = await Contacts!.getAll();
             console.log('Contacts fetched:', contacts.length);
+            console.log('Contacts:', contacts);
         } else if (res === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
             Alert.alert(
                 'Permission Required',
