@@ -10,4 +10,7 @@ export type RootStackParamList = {
     };
     ResetPassword: undefined;
     Home: undefined;
+    Contact: {
+        contacts: any
+    }
 }

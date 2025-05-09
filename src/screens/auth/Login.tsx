@@ -76,6 +76,7 @@ const LoginScreen = () => {
 
     return (
         <View style={styles.container}>
+            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Home')}><Text>home</Text></TouchableOpacity>
             <Text style={styles.heading}>Login</Text>
             <Image source={require('../../../assets/images/explit_logo.png')} style={styles.logo} />
             <View style={styles.inputContainer}>
