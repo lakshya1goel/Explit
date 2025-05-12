@@ -1,7 +1,7 @@
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { View } from 'react-native';
 import { FlatList, Text } from 'react-native-gesture-handler';
-import { RootStackParamList } from '../../types';
+import { RootStackParamList } from '../types';
 
 const ContactScreen = () => {
     const route = useRoute<RouteProp<RootStackParamList, 'Contact'>>();
