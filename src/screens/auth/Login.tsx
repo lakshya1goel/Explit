@@ -7,8 +7,10 @@ import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../types';
 import { useDispatch, useSelector } from 'react-redux';
 import Snackbar from 'react-native-snackbar';
-import { login } from '../../store/slices/authSlice';
+import { googleSignIn, login } from '../../store/slices/authSlice';
 import { AppDispatch, RootState } from '../../store';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { WEBCLIENT_ID } from '@env';
 
 const LoginScreen = () => {
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -19,6 +21,14 @@ const LoginScreen = () => {
     });
 
     const { loading, isAuthenticated } = useSelector((state: RootState) => state.auth);
+
+    useEffect(() => {
+        GoogleSignin.configure({
+          webClientId: WEBCLIENT_ID,
+          offlineAccess: true,
+          forceCodeForRefreshToken: true,
+        });
+      }, []);
 
     useEffect(() => {
         if (isAuthenticated) {
@@ -74,11 +84,26 @@ const LoginScreen = () => {
         }
     };
 
+    const handleGoogleLogin = async () => {
+        console.log('Google login clicked');
+        try {
+            await dispatch(googleSignIn()).unwrap();
+        } catch (err) {
+            if (typeof err === 'string') {
+                showErrorMessage(err);
+            } else if (err instanceof Error) {
+                showErrorMessage(err.message);
+            } else {
+                showErrorMessage('Google login failed');
+            }
+        }
+    };
+
     return (
         <View style={styles.container}>
-            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Home')}><Text>home</Text></TouchableOpacity>
+            {/* <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Home')}><Text>home</Text></TouchableOpacity>
             <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Chat')}><Text>chat</Text></TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('GroupSummary')}><Text>Summary</Text></TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('GroupSummary')}><Text>Summary</Text></TouchableOpacity> */}
             <Text style={styles.heading}>Login</Text>
             <Image source={require('../../../assets/images/explit_logo.png')} style={styles.logo} />
             <View style={styles.inputContainer}>
@@ -112,6 +137,17 @@ const LoginScreen = () => {
             ) : (
                 <Text>Login</Text>
             )}
+            </TouchableOpacity>
+            <View style={styles.dividerContainer}>
+                <View style={styles.divider} />
+                <Text style={styles.dividerText}>OR</Text>
+                <View style={styles.divider} />
+            </View>
+            <TouchableOpacity style={styles.googleButton} onPress={async () => { await handleGoogleLogin(); }}>
+                {/* <Image source={require('../../../assets/images/google_logo.png')}
+                    style={styles.googleLogo}
+                /> */}
+                <Text style={styles.googleButtonText}>Continue with Google</Text>
             </TouchableOpacity>
             <Text style={styles.accountText}>Don’t have an account ?</Text>
             <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
@@ -175,6 +211,43 @@ const styles = StyleSheet.create({
         fontSize: 14,
         lineHeight: 20,
         letterSpacing: 0.02,
+    },
+    dividerContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        width: '90%',
+        marginVertical: 20,
+    },
+    divider: {
+        flex: 1,
+        height: 1,
+        backgroundColor: '#ABB5B5',
+    },
+    dividerText: {
+        marginHorizontal: 8,
+        color: '#FFFFFF',
+        fontWeight: '500',
+    },
+    googleButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#FFFFFF',
+        borderRadius: 4,
+        paddingVertical: 10,
+        paddingHorizontal: 16,
+        width: '90%',
+        marginBottom: 16,
+    },
+    // googleLogo: {
+    //     width: 20,
+    //     height: 20,
+    //     marginRight: 10,
+    // },
+    googleButtonText: {
+        color: '#000000',
+        fontWeight: '500',
+        fontSize: 16,
     },
 });
 export default LoginScreen;

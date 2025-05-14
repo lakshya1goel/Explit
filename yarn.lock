@@ -1534,6 +1534,11 @@
     prompts "^2.4.2"
     semver "^7.5.2"
 
+"@react-native-google-signin/google-signin@^14.0.0":
+  version "14.0.0"
+  resolved "https://registry.yarnpkg.com/@react-native-google-signin/google-signin/-/google-signin-14.0.0.tgz#2c6909a8388debd6c7e0bdb57e5677f731df3e50"
+  integrity sha512-w//dQwYI0+F+y82ubXqHK3AqLdbQ2jXskB6W7EOOC9mruBi35zLOYWO7ctfXtmNBJdjhg3BhzDAwkjUdYPMyUg==
+
 "@react-native/assets-registry@0.79.1":
   version "0.79.1"
   resolved "https://registry.yarnpkg.com/@react-native/assets-registry/-/assets-registry-0.79.1.tgz#39ce0a710a03d98c276cfa2877a925f1677614bd"
