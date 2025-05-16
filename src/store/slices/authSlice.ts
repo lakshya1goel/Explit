@@ -5,7 +5,7 @@ import { BASE_URL } from '@env';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 
 const api = axios.create({
-  baseURL: BASE_URL || 'http://140.40.2.203:8000/api/',
+  baseURL: BASE_URL || 'http://192.168.96.248:8000/api/',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -121,35 +121,38 @@ export const verifyMobile = createAsyncThunk<AuthResponse, VerifyMobileCredentia
   }
 );
 
-export const googleSignIn = createAsyncThunk<string, void, { rejectValue: string }>(
-  'auth/googleSignIn',
+export const googleSignIn = createAsyncThunk<AuthResponse, void, { rejectValue: string }>(
+  'oauth/google/callback',
   async (_, { rejectWithValue }) => {
     try {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
-      console.log(userInfo);
-      console.log(userInfo.data?.idToken);
+      var code = userInfo?.data?.serverAuthCode;
+      console.log(code);
+      if (!code) {
+        return rejectWithValue('Google sign-in did not return a code');
+      }
+      const response = await api.post<AuthResponse>('oauth/google/callback?code=' + code);
+      console.log("here");
 
-      return "success"; // temporary for testing
+      if (response.data.success) {
+        return response.data;
+      }
+
+      return rejectWithValue(response.data.message);
     } catch (error: any) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-        console.log('User cancelled the login flow');
         return rejectWithValue('User cancelled the login flow');
       } else if (error.code === statusCodes.IN_PROGRESS) {
-        console.log('Signing in');
         return rejectWithValue('Signing in');
       } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        console.log('Play services not available');
         return rejectWithValue('Play services not available');
       } else {
-        console.log('Some other error happened');
-        console.log(error.message);
-        console.log(error.code);
+        console.log(error);
         return rejectWithValue('Unknown error');
       }
     }
   }
-
 );
 
 const initialState: AuthState = {
@@ -220,16 +223,15 @@ const authSlice = createSlice({
     }).addCase(googleSignIn.fulfilled, (state, action) => {
       state.loading = false;
       state.isAuthenticated = true;
-      console.log("Google sign-in success:", action.payload);
-      // state.user = {
-      //   id: action.payload.data.id,
-      //   email: action.payload.data.email,
-      //   mobile: action.payload.data.mobile,
-      //   is_email_verified: action.payload.data.is_email_verified,
-      //   is_mobile_verified: action.payload.data.is_mobile_verified,
-      // };
-      // state.accessToken = action.payload.data.access_token;
-      // state.refreshToken = action.payload.data.refresh_token;
+      state.user = {
+        id: action.payload.data.id,
+        email: action.payload.data.email,
+        mobile: action.payload.data.mobile,
+        is_email_verified: action.payload.data.is_email_verified,
+        is_mobile_verified: action.payload.data.is_mobile_verified,
+      };
+      state.accessToken = action.payload.data.access_token;
+      state.refreshToken = action.payload.data.refresh_token;
     }).addCase(googleSignIn.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload || 'Google Sign In Failed';
