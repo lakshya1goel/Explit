@@ -128,12 +128,10 @@ export const googleSignIn = createAsyncThunk<AuthResponse, void, { rejectValue: 
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
       var code = userInfo?.data?.serverAuthCode;
-      console.log(code);
       if (!code) {
         return rejectWithValue('Google sign-in did not return a code');
       }
       const response = await api.post<AuthResponse>('oauth/google/callback?code=' + code);
-      console.log("here");
 
       if (response.data.success) {
         return response.data;

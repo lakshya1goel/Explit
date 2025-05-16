@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store';
 import Snackbar from 'react-native-snackbar';
 import { verifyMobile } from '../../store/slices/authSlice';
+import AuthService from '../../services/AuthService';
 
 const VerifyMobileScreen = () => {
     const route = useRoute<RouteProp<RootStackParamList, 'VerifyMail'>>();
@@ -18,15 +19,32 @@ const VerifyMobileScreen = () => {
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const inputRefs = useRef<Array<TextInput | null>>(new Array(6).fill(null));
 
-    const { loading, isMobileVerified } = useSelector((state: RootState) => state.auth);
+    const { loading, isMobileVerified, accessToken, refreshToken} = useSelector((state: RootState) => state.auth);
     console.log(mobile);
 
     useEffect(() => {
-        if (isMobileVerified) {
-            showSuccessMessage('Mobile Verified!');
-            navigation.navigate('Home');
+        if (isMobileVerified && accessToken && refreshToken) {
+            const saveTokens = async () => {
+                try {
+                    const accessExpTime = new Date();
+                    accessExpTime.setDate(accessExpTime.getDate() + 1);
+                    const refreshExpTime = new Date();
+                    refreshExpTime.setDate(refreshExpTime.getDate() + 30);
+                    await AuthService.storeToken({
+                        accessToken: accessToken,
+                        refreshToken: refreshToken,
+                        accessExpTime: accessExpTime.getTime(),
+                        refreshExpTime: refreshExpTime.getTime(),
+                    });
+                    showSuccessMessage('Mobile Verified!');
+                    navigation.navigate('Home');
+                } catch (error) {
+                    showErrorMessage('Failed to save authentication tokens');
+                }
+            };
+            saveTokens();
         }
-    }, [isMobileVerified, navigation]);
+    }, [isMobileVerified, navigation, accessToken, refreshToken]);
 
     const showSuccessMessage = (message: string) => {
         Snackbar.show({
