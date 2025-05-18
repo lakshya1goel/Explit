@@ -1,16 +1,26 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, FlatList, TextInput, Pressable, StyleSheet } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { RootStackParamList } from '../types';
 import theme from '../styles/theme';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../store';
+import Snackbar from 'react-native-snackbar';
+import { createGroup } from '../store/slices/groupSlice';
+import { GroupCreationPayload } from '../store/types';
 
 const ContactScreen = () => {
   const route = useRoute<RouteProp<RootStackParamList, 'Contact'>>();
   const { contacts } = route.params;
+  const dispatch = useDispatch<AppDispatch>();
 
-  const [selectedPhoneNumbers, setSelectedPhoneNumbers] = useState<Set<string>>(new Set());
-  const [groupTitle, setGroupTitle] = useState('');
-  const [groupDesc, setGroupDesc] = useState('');
+  const [details, setDetails] = React.useState({
+    groupTitle: '',
+    groupDesc: '',
+    selectedPhoneNumbers: new Set<string>(),
+  });
+
+  const { loading, success } = useSelector((state: RootState) => state.group);
 
   const cleanPhoneNumber = (number: string): string => {
     return number.replace(/\D/g, '').replace(/^91/, '');
@@ -18,11 +28,74 @@ const ContactScreen = () => {
 
   const toggleSelect = (phoneNumber: string) => {
     const cleaned = cleanPhoneNumber(phoneNumber);
-    setSelectedPhoneNumbers(prev => {
-      const newSet = new Set(prev);
-      newSet.has(cleaned) ? newSet.delete(cleaned) : newSet.add(cleaned);
-      return newSet;
+    setDetails(prevDetails => {
+      const updatedSet = new Set(prevDetails.selectedPhoneNumbers);
+      if (updatedSet.has(cleaned)) {
+        updatedSet.delete(cleaned);
+      } else {
+        updatedSet.add(cleaned);
+      }
+      return {
+        ...prevDetails,
+        selectedPhoneNumbers: updatedSet,
+      };
     });
+  };
+
+  useEffect(() => {
+    if (success) {
+      showSuccessMessage('Group created successfully');
+      setDetails({
+        groupTitle: '',
+        groupDesc: '',
+        selectedPhoneNumbers: new Set(),
+      });
+    }
+  }, [success]);
+
+  const showSuccessMessage = (message: string) => {
+    Snackbar.show({
+        text: message,
+        duration: Snackbar.LENGTH_SHORT,
+        backgroundColor: 'green',
+    });
+  };
+
+  const showErrorMessage = (message: string) => {
+    Snackbar.show({
+        text: message,
+        duration: Snackbar.LENGTH_SHORT,
+        backgroundColor: 'red',
+    });
+  };
+
+  const handleCreateGroup = async () => {
+    try {
+      if (!details.groupTitle.trim()) {
+        showErrorMessage('Group title is required');
+        return;
+      }
+      if (details.selectedPhoneNumbers.size === 0) {
+        showErrorMessage('Select at least one contact');
+        return;
+      }
+      const payload: GroupCreationPayload = {
+        name: details.groupTitle.trim(),
+        description: details.groupDesc.trim(),
+        users: Array.from(details.selectedPhoneNumbers),
+      };
+      console.log('Group creation payload:', payload);
+      await dispatch(createGroup(payload)).unwrap();
+    } catch (err) {
+      console.log('Create group error:', err);
+      if (typeof err === 'string') {
+        showErrorMessage(err);
+      } else if (err instanceof Error) {
+        showErrorMessage(err.message);
+      } else {
+        showErrorMessage('Group creation failed');
+      }
+    }
   };
 
   return (
@@ -32,15 +105,15 @@ const ContactScreen = () => {
           style={styles.input}
           placeholder="Group Title"
           placeholderTextColor="#ABB5B5"
-          value={groupTitle}
-          onChangeText={setGroupTitle}
+          value={details.groupTitle}
+          onChangeText={(text) => setDetails({ ...details, groupTitle: text })}
         />
         <TextInput
           style={styles.input}
           placeholder="Group Description"
           placeholderTextColor="#ABB5B5"
-          value={groupDesc}
-          onChangeText={setGroupDesc}
+          value={details.groupDesc}
+          onChangeText={(text) => setDetails({ ...details, groupDesc: text })}
         />
       </View>
 
@@ -51,7 +124,7 @@ const ContactScreen = () => {
         renderItem={({ item }) => {
           const phoneNumberRaw = item.phoneNumbers?.[0]?.number;
           const cleaned = phoneNumberRaw ? cleanPhoneNumber(phoneNumberRaw) : '';
-          const isSelected = selectedPhoneNumbers.has(cleaned);
+          const isSelected = details.selectedPhoneNumbers.has(cleaned);
           return (
             <Pressable
               onPress={() => phoneNumberRaw && toggleSelect(phoneNumberRaw)}
@@ -67,17 +140,17 @@ const ContactScreen = () => {
         }}
       />
 
-      {selectedPhoneNumbers.size > 0 && (
+      {details.selectedPhoneNumbers.size > 0 && (
         <View style={styles.footer}>
           <View style={styles.footerContent}>
             <View style={styles.footerContainer}>
               <Text style={styles.selectedPhoneText}>
-                {[...selectedPhoneNumbers].slice(0, 5).join(', ')}
-                {selectedPhoneNumbers.size > 5 ? '...' : ''}
+                {[...details.selectedPhoneNumbers].slice(0, 5).join(', ')}
+                {details.selectedPhoneNumbers.size > 5 ? '...' : ''}
               </Text>
             </View>
-            <Pressable style={styles.tickButton} onPress={() => console.log('Tick pressed')}>
-              <Text style={styles.tickText}>✔</Text>
+            <Pressable style={styles.tickButton} onPress={handleCreateGroup} disabled={loading}>
+              <Text style={styles.tickText}>{loading ? '...' : '✔'}</Text>
             </Pressable>
           </View>
         </View>
