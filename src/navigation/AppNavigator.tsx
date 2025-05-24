@@ -11,6 +11,7 @@ import VerifyMobileScreen from '../screens/auth/VerifyMobile';
 import ContactScreen from '../screens/Contact';
 import ChatScreen from '../screens/Chat';
 import GroupSummaryScreen from '../screens/GroupSummary';
+import SplashScreen from '../screens/Splash';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -18,6 +19,7 @@ const AppNavigator = () => {
     return (
         <NavigationContainer>
             <Stack.Navigator screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="Splash" component={SplashScreen} />
                 <Stack.Screen name="Login" component={LoginScreen} />
                 <Stack.Screen name="SignUp" component={SignUpScreen} />
                 <Stack.Screen name="VerifyMail" component={VerifyMailScreen} />

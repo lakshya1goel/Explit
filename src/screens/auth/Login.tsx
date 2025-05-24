@@ -11,6 +11,7 @@ import { googleSignIn, login } from '../../store/slices/authSlice';
 import { AppDispatch, RootState } from '../../store';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { WEBCLIENT_ID } from '@env';
+import AuthService from '../../services/AuthService';
 
 const LoginScreen = () => {
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -20,7 +21,7 @@ const LoginScreen = () => {
         password: '',
     });
 
-    const { loading, isAuthenticated } = useSelector((state: RootState) => state.auth);
+    const { loading, isAuthenticated, accessToken, refreshToken } = useSelector((state: RootState) => state.auth);
 
     useEffect(() => {
         GoogleSignin.configure({
@@ -31,11 +32,28 @@ const LoginScreen = () => {
       }, []);
 
     useEffect(() => {
-        if (isAuthenticated) {
-            showSuccessMessage('Login Successful!');
-            navigation.navigate('Home');
+        if (isAuthenticated && accessToken && refreshToken) {
+            const saveTokens = async () => {
+                try {
+                    const accessExpTime = new Date();
+                    accessExpTime.setDate(accessExpTime.getDate() + 1);
+                    const refreshExpTime = new Date();
+                    refreshExpTime.setDate(refreshExpTime.getDate() + 30);
+                    await AuthService.storeToken({
+                        accessToken: accessToken,
+                        refreshToken: refreshToken,
+                        accessExpTime: accessExpTime.getTime(),
+                        refreshExpTime: refreshExpTime.getTime(),
+                    });
+                    showSuccessMessage('Login Successful!');
+                    navigation.navigate('Home');
+                } catch (error) {
+                    showErrorMessage('Failed to save authentication tokens');
+                }
+            };
+            saveTokens();
         }
-    }, [isAuthenticated, navigation]);
+    }, [isAuthenticated, navigation, accessToken, refreshToken]);
 
     const showSuccessMessage = (message: string) => {
         Snackbar.show({

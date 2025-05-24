@@ -62,7 +62,7 @@ const HomeScreen = () => {
     return (
         <View>
             <TouchableOpacity style={{alignItems: 'center', padding: 20, marginTop: 50, backgroundColor: '#ddd'}} onPress={requestContactPermission}>
-                <Text>Get Contacts</Text>
+                <Text>Create Group</Text>
             </TouchableOpacity>
         </View>
     );
