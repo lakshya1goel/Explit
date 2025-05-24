@@ -123,7 +123,7 @@ const GroupScreen = () => {
                 contentContainerStyle={styles.listContent}
                 renderItem={({ item }) => {
                     return (
-                        <Pressable onPress={() => {navigation.navigate('Chat');}} style={styles.card}>
+                        <Pressable onPress={() => {navigation.navigate('Chat', {groupId: item.id});}} style={styles.card}>
                             <View style={styles.avatar}>
                                 <Text style={styles.avatarText}>{item.name?.charAt(0).toUpperCase()}</Text>
                             </View>

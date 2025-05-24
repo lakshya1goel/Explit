@@ -1,11 +1,66 @@
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Text, TextInput } from 'react-native-gesture-handler';
 import theme from '../../styles/theme';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { RouteProp, useRoute } from '@react-navigation/native';
 import { RootStackParamList } from '../../types';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../store';
+import React, { useEffect } from 'react';
+import showSuccessMessage from '../components/SuccessDialog';
+import showErrorMessage from '../components/ErrorDialog';
+import { SplitCreationPayload } from '../../store/types';
+import { createSplit } from '../../store/slices/splitSlice';
 
 const SplitExpenseScreen = () => {
-    const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+    const route = useRoute<RouteProp<RootStackParamList, 'SplitExpense'>>();
+    const { groupId } = route.params;
+    const dispatch = useDispatch<AppDispatch>();
+
+    const [details, setDetails] = React.useState({
+        amount: '',
+        title: '',
+        desc: '',
+    });
+
+    const { loading, success } = useSelector((state: RootState) => state.split);
+
+    useEffect(() => {
+        if (success) {
+          showSuccessMessage('Expense created successfully');
+          setDetails({
+            amount: '',
+            title: '',
+            desc: '',
+          });
+        }
+    }, [success]);
+
+    const handleCreateGroup = async () => {
+        try {
+          if (!details.title.trim() || details.amount.trim() === '') {
+            showErrorMessage('Expense title is required');
+            return;
+          }
+          const payload: SplitCreationPayload = {
+            group_id: groupId,
+            amount: parseFloat(details.amount.trim()),
+            title: details.title.trim(),
+            description: details.desc.trim(),
+          };
+          console.log('Group creation payload:', payload);
+          await dispatch(createSplit(payload)).unwrap();
+        } catch (err) {
+          console.log('Create group error:', err);
+          if (typeof err === 'string') {
+            showErrorMessage(err);
+          } else if (err instanceof Error) {
+            showErrorMessage(err.message);
+          } else {
+            showErrorMessage('Group creation failed');
+          }
+        }
+    };
+
     return (
         <View style={styles.container}>
             <View style={styles.appBar}>
@@ -16,30 +71,36 @@ const SplitExpenseScreen = () => {
                 placeholder="Amount"
                 placeholderTextColor="#ABB5B5"
                 keyboardType="numeric"
-                // value={details.groupTitle}
-                // onChangeText={(text) => setDetails({ ...details, groupTitle: text })}
+                value={details.amount}
+                onChangeText={(text) => setDetails({ ...details, amount: text })}
             />
             <TextInput
                 style={styles.input}
                 placeholder="Title"
                 placeholderTextColor="#ABB5B5"
-                // value={details.groupTitle}
-                // onChangeText={(text) => setDetails({ ...details, groupTitle: text })}
+                value={details.title}
+                onChangeText={(text) => setDetails({ ...details, title: text })}
             />
             <TextInput
                 style={styles.input}
                 placeholder="Description"
                 placeholderTextColor="#ABB5B5"
-                // value={details.groupDesc}
-                // onChangeText={(text) => setDetails({ ...details, groupDesc: text })}
+                value={details.desc}
+                onChangeText={(text) => setDetails({ ...details, desc: text })}
             />
             <View style={styles.buttonBar}>
-            <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('SplitExpense')}>
+            <TouchableOpacity style={styles.actionButton} onPress={() => {}}>
                 <Text style={styles.buttonText}>Cancel</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('SplitExpense')}>
+            {loading ? (
+                <ActivityIndicator
+                    size="large"
+                    color={theme.colors.primary[500]}
+                    style={styles.loadingIndicator}
+                />
+            ) : <TouchableOpacity style={styles.actionButton} onPress={() => {handleCreateGroup();}}>
                 <Text style={styles.buttonText}>Save</Text>
-            </TouchableOpacity>
+            </TouchableOpacity>}
             </View>
         </View>
     );
@@ -94,6 +155,11 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         color: 'white',
+    },
+    loadingIndicator: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });
 

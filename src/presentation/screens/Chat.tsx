@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, ListRenderItem } from 'react-native';
 import theme from '../../styles/theme';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { NavigationProp, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { RootStackParamList } from '../../types';
 
 type MessageItem = {
@@ -24,6 +24,8 @@ const ChatScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [messages, setMessages] = useState<MessageItem[]>(initialMessages);
   const [inputMessage, setInputMessage] = useState('');
+  const route = useRoute<RouteProp<RootStackParamList, 'Chat'>>();
+  const { groupId } = route.params;
 
   const sendMessage = () => {
     if (inputMessage.trim()) {
@@ -85,7 +87,7 @@ const ChatScreen = () => {
       />
 
       <View style={styles.inputBar}>
-        <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('SplitExpense')}>
+        <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('SplitExpense', { groupId: groupId})}>
           <Text style={styles.buttonText}>Split Expense</Text>
         </TouchableOpacity>
         <TextInput
