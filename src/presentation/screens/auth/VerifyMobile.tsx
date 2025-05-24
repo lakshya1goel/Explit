@@ -1,56 +1,61 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Image, Keyboard, Text, TouchableOpacity, View } from 'react-native';
 import { StyleSheet } from 'react-native';
-import theme from '../../styles/theme';
+import theme from '../../../styles/theme';
 import { TextInput } from 'react-native-gesture-handler';
 import { NavigationProp, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-import { RootStackParamList } from '../../types';
+import { RootStackParamList } from '../../../types';
 import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '../../store';
-import Snackbar from 'react-native-snackbar';
-import { verifyEmail } from '../../store/slices/authSlice';
+import { AppDispatch, RootState } from '../../../store';
+import { verifyMobile } from '../../../store/slices/authSlice';
+import AuthService from '../../../services/AuthService';
+import showErrorMessage from '../../components/ErrorDialog';
+import showSuccessMessage from '../../components/SuccessDialog';
 
-const VerifyMailScreen = () => {
+const VerifyMobileScreen = () => {
     const route = useRoute<RouteProp<RootStackParamList, 'VerifyMail'>>();
-    const {email, mobile} = route.params;
+    const {mobile} = route.params;
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
     const dispatch = useDispatch<AppDispatch>();
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const inputRefs = useRef<Array<TextInput | null>>(new Array(6).fill(null));
 
-    const { loading, isEmailVerified } = useSelector((state: RootState) => state.auth);
+    const { loading, isMobileVerified, accessToken, refreshToken} = useSelector((state: RootState) => state.auth);
+    console.log(mobile);
 
     useEffect(() => {
-        if (isEmailVerified) {
-            showSuccessMessage('Email Verified!');
-            navigation.navigate('VerifyMobile', {mobile: mobile});
+        if (isMobileVerified && accessToken && refreshToken) {
+            const saveTokens = async () => {
+                try {
+                    const accessExpTime = new Date();
+                    accessExpTime.setDate(accessExpTime.getDate() + 1);
+                    const refreshExpTime = new Date();
+                    refreshExpTime.setDate(refreshExpTime.getDate() + 30);
+                    await AuthService.storeToken({
+                        accessToken: accessToken,
+                        refreshToken: refreshToken,
+                        accessExpTime: accessExpTime.getTime(),
+                        refreshExpTime: refreshExpTime.getTime(),
+                    });
+                    showSuccessMessage('Mobile Verified!');
+                    navigation.navigate('Group');
+                } catch (error) {
+                    showErrorMessage('Failed to save authentication tokens');
+                }
+            };
+            saveTokens();
         }
-    }, [isEmailVerified, navigation, mobile]);
+    }, [isMobileVerified, navigation, accessToken, refreshToken]);
 
-    const showSuccessMessage = (message: string) => {
-        Snackbar.show({
-            text: message,
-            duration: Snackbar.LENGTH_SHORT,
-            backgroundColor: 'green',
-        });
-    };
-
-    const showErrorMessage = (message: string) => {
-        Snackbar.show({
-            text: message,
-            duration: Snackbar.LENGTH_SHORT,
-            backgroundColor: 'red',
-        });
-    };
-
-    const handleVerifyEmail = async () => {
+    const handleVerifyMobile = async () => {
         try {
             const otpString = otp.join('');
             if (otpString.length !== 6) {
                 showErrorMessage('Please enter complete OTP');
                 return;
             }
-            await dispatch(verifyEmail({ email: email, otp: otpString })).unwrap();
+
+            await dispatch(verifyMobile({ mobile, otp: otpString })).unwrap();
         } catch (err) {
             if (typeof err === 'string') {
                 showErrorMessage(err);
@@ -81,7 +86,7 @@ const VerifyMailScreen = () => {
     };
     return (
         <View style={styles.container}>
-            <Text style={styles.heading}>Verify Mail</Text>
+            <Text style={styles.heading}>Verify Mobile Number</Text>
             <Image source={require('../../../assets/images/explit_logo.png')} style={styles.logo} />
             <View style={styles.otpContainer}>
                 {otp.map((digit, index) => (
@@ -106,7 +111,7 @@ const VerifyMailScreen = () => {
             <Text style={styles.text}>Resend in 5:00 mins</Text> */}
             <TouchableOpacity style={styles.button}
             onPress={async () => {
-                await handleVerifyEmail();
+                await handleVerifyMobile();
                 Keyboard.dismiss();
             }}
             disabled={loading}>
@@ -170,4 +175,4 @@ const styles = StyleSheet.create({
         fontWeight: '400',
     },
 });
-export default VerifyMailScreen;
+export default VerifyMobileScreen;

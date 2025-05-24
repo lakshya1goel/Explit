@@ -2,16 +2,17 @@ import React, { useEffect } from 'react';
 import { ActivityIndicator, Image, Keyboard, Text, TouchableOpacity, View } from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
 import { StyleSheet } from 'react-native';
-import theme from '../../styles/theme';
+import theme from '../../../styles/theme';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { RootStackParamList } from '../../types';
+import { RootStackParamList } from '../../../types';
 import { useDispatch, useSelector } from 'react-redux';
-import Snackbar from 'react-native-snackbar';
-import { googleSignIn, login } from '../../store/slices/authSlice';
-import { AppDispatch, RootState } from '../../store';
+import { googleSignIn, login } from '../../../store/slices/authSlice';
+import { AppDispatch, RootState } from '../../../store';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { WEBCLIENT_ID } from '@env';
-import AuthService from '../../services/AuthService';
+import AuthService from '../../../services/AuthService';
+import showErrorMessage from '../../components/ErrorDialog';
+import showSuccessMessage from '../../components/SuccessDialog';
 
 const LoginScreen = () => {
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -54,22 +55,6 @@ const LoginScreen = () => {
             saveTokens();
         }
     }, [isAuthenticated, navigation, accessToken, refreshToken]);
-
-    const showSuccessMessage = (message: string) => {
-        Snackbar.show({
-            text: message,
-            duration: Snackbar.LENGTH_SHORT,
-            backgroundColor: 'green',
-        });
-    };
-
-    const showErrorMessage = (message: string) => {
-        Snackbar.show({
-            text: message,
-            duration: Snackbar.LENGTH_SHORT,
-            backgroundColor: 'red',
-        });
-    };
 
     const validateForm = (): boolean => {
         if (!credentials.email || !credentials.password) {

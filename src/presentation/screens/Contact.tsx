@@ -1,13 +1,14 @@
 import React, { useEffect } from 'react';
 import { View, Text, FlatList, TextInput, Pressable, StyleSheet } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
-import { RootStackParamList } from '../types';
-import theme from '../styles/theme';
+import { RootStackParamList } from '../../types';
+import theme from '../../styles/theme';
 import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '../store';
-import Snackbar from 'react-native-snackbar';
-import { createGroup } from '../store/slices/groupSlice';
-import { GroupCreationPayload } from '../store/types';
+import { AppDispatch, RootState } from '../../store';
+import { createGroup } from '../../store/slices/groupSlice';
+import { GroupCreationPayload } from '../../store/types';
+import showSuccessMessage from '../components/SuccessDialog';
+import showErrorMessage from '../components/ErrorDialog';
 
 const ContactScreen = () => {
   const route = useRoute<RouteProp<RootStackParamList, 'Contact'>>();
@@ -52,22 +53,6 @@ const ContactScreen = () => {
       });
     }
   }, [success]);
-
-  const showSuccessMessage = (message: string) => {
-    Snackbar.show({
-        text: message,
-        duration: Snackbar.LENGTH_SHORT,
-        backgroundColor: 'green',
-    });
-  };
-
-  const showErrorMessage = (message: string) => {
-    Snackbar.show({
-        text: message,
-        duration: Snackbar.LENGTH_SHORT,
-        backgroundColor: 'red',
-    });
-  };
 
   const handleCreateGroup = async () => {
     try {

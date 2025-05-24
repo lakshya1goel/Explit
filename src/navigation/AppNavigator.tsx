@@ -2,17 +2,16 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { RootStackParamList } from '../types';
-import SignUpScreen from '../screens/auth/SignUp';
-import LoginScreen from '../screens/auth/Login';
-import VerifyMailScreen from '../screens/auth/VerfyMail';
-import ResetPasswordScreen from '../screens/auth/ResetPassword';
-// import HomeScreen from '../screens/Home';
-import VerifyMobileScreen from '../screens/auth/VerifyMobile';
-import ContactScreen from '../screens/Contact';
-import ChatScreen from '../screens/Chat';
-import GroupSummaryScreen from '../screens/GroupSummary';
-import SplashScreen from '../screens/Splash';
-import GroupScreen from '../screens/Groups';
+import SignUpScreen from '../presentation/screens/auth/SignUp';
+import LoginScreen from '../presentation/screens/auth/Login';
+import VerifyMailScreen from '../presentation/screens/auth/VerfyMail';
+import ResetPasswordScreen from '../presentation/screens/auth/ResetPassword';
+import VerifyMobileScreen from '../presentation/screens/auth/VerifyMobile';
+import ContactScreen from '../presentation/screens/Contact';
+import ChatScreen from '../presentation/screens/Chat';
+import GroupSummaryScreen from '../presentation/screens/GroupSummary';
+import SplashScreen from '../presentation/screens/auth/Splash';
+import GroupScreen from '../presentation/screens/Groups';
 
 const Stack = createStackNavigator<RootStackParamList>();
 

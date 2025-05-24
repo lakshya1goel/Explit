@@ -2,9 +2,9 @@ import React from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
 import { StyleSheet } from 'react-native';
-import theme from '../../styles/theme';
+import theme from '../../../styles/theme';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { RootStackParamList } from '../../types';
+import { RootStackParamList } from '../../../types';
 
 const ResetPasswordScreen = () => {
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
