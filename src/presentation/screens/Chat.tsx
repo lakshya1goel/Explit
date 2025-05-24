@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, ListRenderItem } from 'react-native';
 import theme from '../../styles/theme';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { RootStackParamList } from '../../types';
 
 type MessageItem = {
   id: string;
@@ -19,6 +21,7 @@ const initialMessages: MessageItem[] = [
 ];
 
 const ChatScreen = () => {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [messages, setMessages] = useState<MessageItem[]>(initialMessages);
   const [inputMessage, setInputMessage] = useState('');
 
@@ -78,11 +81,11 @@ const ChatScreen = () => {
         data={messages}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
-        contentContainerStyle={{ padding: 15 }}
+        contentContainerStyle={styles.contentContainerStyle}
       />
 
       <View style={styles.inputBar}>
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('SplitExpense')}>
           <Text style={styles.buttonText}>Split Expense</Text>
         </TouchableOpacity>
         <TextInput
@@ -129,6 +132,9 @@ const styles = StyleSheet.create({
     padding: 15,
     marginVertical: 5,
     alignSelf: 'flex-end',
+  },
+  contentContainerStyle: {
+    padding: 15,
   },
   label: {
     color: 'white',

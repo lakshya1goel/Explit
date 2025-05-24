@@ -12,6 +12,7 @@ import ChatScreen from '../presentation/screens/Chat';
 import GroupSummaryScreen from '../presentation/screens/GroupSummary';
 import SplashScreen from '../presentation/screens/auth/Splash';
 import GroupScreen from '../presentation/screens/Groups';
+import SplitExpenseScreen from '../presentation/screens/Split';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -28,6 +29,7 @@ const AppNavigator = () => {
                 <Stack.Screen name="Group" component={GroupScreen} />
                 <Stack.Screen name="Contact" component={ContactScreen} />
                 <Stack.Screen name="Chat" component={ChatScreen} />
+                <Stack.Screen name="SplitExpense" component={SplitExpenseScreen} />
                 <Stack.Screen name="GroupSummary" component={GroupSummaryScreen} />
             </Stack.Navigator>
         </NavigationContainer>

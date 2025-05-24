@@ -15,5 +15,6 @@ export type RootStackParamList = {
         contacts: any
     }
     Chat: undefined;
+    SplitExpense: undefined;
     GroupSummary: undefined;
 }
