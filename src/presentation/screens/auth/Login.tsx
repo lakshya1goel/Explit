@@ -2,16 +2,17 @@ import React, { useEffect } from 'react';
 import { ActivityIndicator, Image, Keyboard, Text, TouchableOpacity, View } from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
 import { StyleSheet } from 'react-native';
-import theme from '../../styles/theme';
+import theme from '../../../styles/theme';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { RootStackParamList } from '../../types';
+import { RootStackParamList } from '../../../types';
 import { useDispatch, useSelector } from 'react-redux';
-import Snackbar from 'react-native-snackbar';
-import { googleSignIn, login } from '../../store/slices/authSlice';
-import { AppDispatch, RootState } from '../../store';
+import { googleSignIn, login } from '../../../store/slices/authSlice';
+import { AppDispatch, RootState } from '../../../store';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { WEBCLIENT_ID } from '@env';
-import AuthService from '../../services/AuthService';
+import AuthService from '../../../services/AuthService';
+import showErrorMessage from '../../components/ErrorDialog';
+import showSuccessMessage from '../../components/SuccessDialog';
 
 const LoginScreen = () => {
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -46,7 +47,7 @@ const LoginScreen = () => {
                         refreshExpTime: refreshExpTime.getTime(),
                     });
                     showSuccessMessage('Login Successful!');
-                    navigation.navigate('Home');
+                    navigation.navigate('Group');
                 } catch (error) {
                     showErrorMessage('Failed to save authentication tokens');
                 }
@@ -54,22 +55,6 @@ const LoginScreen = () => {
             saveTokens();
         }
     }, [isAuthenticated, navigation, accessToken, refreshToken]);
-
-    const showSuccessMessage = (message: string) => {
-        Snackbar.show({
-            text: message,
-            duration: Snackbar.LENGTH_SHORT,
-            backgroundColor: 'green',
-        });
-    };
-
-    const showErrorMessage = (message: string) => {
-        Snackbar.show({
-            text: message,
-            duration: Snackbar.LENGTH_SHORT,
-            backgroundColor: 'red',
-        });
-    };
 
     const validateForm = (): boolean => {
         if (!credentials.email || !credentials.password) {
@@ -119,11 +104,8 @@ const LoginScreen = () => {
 
     return (
         <View style={styles.container}>
-            {/* <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Home')}><Text>home</Text></TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Chat')}><Text>chat</Text></TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('GroupSummary')}><Text>Summary</Text></TouchableOpacity> */}
             <Text style={styles.heading}>Login</Text>
-            <Image source={require('../../../assets/images/explit_logo.png')} style={styles.logo} />
+            <Image source={require('../../../../assets/images/explit_logo.png')} style={styles.logo} />
             <View style={styles.inputContainer}>
                 <TextInput placeholder="Email"
                 placeholderTextColor="#ABB5B5"

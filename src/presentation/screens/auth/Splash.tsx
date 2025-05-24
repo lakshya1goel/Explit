@@ -1,9 +1,9 @@
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { ActivityIndicator, View } from 'react-native';
 import { Text } from 'react-native-gesture-handler';
-import { RootStackParamList } from '../types';
+import { RootStackParamList } from '../../../types';
 import { useEffect, useState } from 'react';
-import AuthService from '../services/AuthService';
+import AuthService from '../../../services/AuthService';
 
 const SplashScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -20,7 +20,7 @@ const SplashScreen = () => {
           const isTokenValid = currentTime < tokens.accessExpTime;
 
           if (isTokenValid) {
-            navigation.navigate('Home');
+            navigation.navigate('Group');
           } else {
             navigation.navigate('Login');
           }

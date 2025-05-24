@@ -10,10 +10,15 @@ export type RootStackParamList = {
         mobile: string;
     };
     ResetPassword: undefined;
-    Home: undefined;
+    Group: undefined;
     Contact: {
         contacts: any
     }
-    Chat: undefined;
+    Chat: {
+        groupId: string;
+    };
+    SplitExpense: {
+        groupId: string;
+    };
     GroupSummary: undefined;
 }
