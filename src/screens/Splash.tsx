@@ -20,7 +20,7 @@ const SplashScreen = () => {
           const isTokenValid = currentTime < tokens.accessExpTime;
 
           if (isTokenValid) {
-            navigation.navigate('Home');
+            navigation.navigate('Group');
           } else {
             navigation.navigate('Login');
           }

@@ -5,7 +5,7 @@ import { BASE_URL } from '@env';
 import AuthService from '../../services/AuthService';
 
 const api = axios.create({
-  baseURL: BASE_URL || 'http://192.168.96.248:8000/api/',
+  baseURL: BASE_URL || 'http://192.168.1.13:8000/api/',
   headers: {
     'Content-Type': 'application/json',
   },
