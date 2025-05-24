@@ -77,7 +77,12 @@ const initialState: GroupState = {
 const groupSlice = createSlice({
   name: 'group',
   initialState,
-  reducers: {},
+  reducers: {
+    resetGroupState: (state) => {
+      state.success = false;
+      state.message = '';
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(createGroup.pending, (state) => {
         state.loading = true;
@@ -117,3 +122,4 @@ const groupSlice = createSlice({
 });
 
 export default groupSlice.reducer;
+export const { resetGroupState } = groupSlice.actions;

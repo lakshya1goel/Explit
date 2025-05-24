@@ -7,7 +7,7 @@ import Contacts from 'react-native-contacts/src/NativeContacts';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store';
 import { useCallback, useEffect } from 'react';
-import { fetchGroups } from '../../store/slices/groupSlice';
+import { fetchGroups, resetGroupState } from '../../store/slices/groupSlice';
 import showErrorMessage from '../components/ErrorDialog';
 import showSuccessMessage from '../components/SuccessDialog';
 
@@ -38,8 +38,9 @@ const GroupScreen = () => {
     useEffect(() => {
         if (success) {
             showSuccessMessage('Groups fetched successfully');
+            dispatch(resetGroupState());
         }
-    }, [success]);
+    }, [success, dispatch]);
 
     const requestContactPermission = async () => {
         try {
