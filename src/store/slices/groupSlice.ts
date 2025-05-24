@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { GroupCreationPayload, GroupCreationResponse, GroupState } from '../types';
+import { GetAllGroupsResponse, GroupCreationPayload, GroupCreationResponse, GroupState } from '../types';
 import axios, { AxiosError } from 'axios';
 import { BASE_URL } from '@env';
 import AuthService from '../../services/AuthService';
@@ -23,10 +23,32 @@ api.interceptors.request.use(
 );
 
 export const createGroup = createAsyncThunk<GroupCreationResponse, GroupCreationPayload, { rejectValue: string }>(
-  'group',
+  'group-create',
   async (details, { rejectWithValue }) => {
     try {
       const response = await api.post<GroupCreationResponse>('group', details);
+
+      if (response.data.success) {
+        return response.data;
+      }
+
+      return rejectWithValue(response.data.message);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue(
+          error.response?.data?.message
+        );
+      }
+      return rejectWithValue('An unexpected error occurred');
+    }
+  }
+);
+
+export const fetchGroups = createAsyncThunk<GetAllGroupsResponse, void, { rejectValue: string }>(
+  'groups-fetch',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get<GetAllGroupsResponse>('group');
 
       if (response.data.success) {
         return response.data;
@@ -49,6 +71,7 @@ const initialState: GroupState = {
   error: null,
   success: false,
   message: '',
+  data: [],
 };
 
 const groupSlice = createSlice({
@@ -71,6 +94,24 @@ const groupSlice = createSlice({
         state.loading = false;
         state.success = false;
         state.error = action.payload || 'Failed to create group';
+      })
+      .addCase(fetchGroups.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.success = false;
+        state.message = '';
+      })
+      .addCase(fetchGroups.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = true;
+        state.message = action.payload.message;
+        state.data = action.payload.data;
+        state.error = null;
+      })
+      .addCase(fetchGroups.rejected, (state, action) => {
+        state.loading = false;
+        state.success = false;
+        state.error = action.payload || 'Failed to fetch groups';
       });
   },
 });

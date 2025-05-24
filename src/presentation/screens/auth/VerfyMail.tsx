@@ -67,7 +67,7 @@ const VerifyMailScreen = () => {
     return (
         <View style={styles.container}>
             <Text style={styles.heading}>Verify Mail</Text>
-            <Image source={require('../../../assets/images/explit_logo.png')} style={styles.logo} />
+            <Image source={require('../../../../assets/images/explit_logo.png')} style={styles.logo} />
             <View style={styles.otpContainer}>
                 {otp.map((digit, index) => (
                     <TextInput

@@ -11,14 +11,14 @@ const ResetPasswordScreen = () => {
     return (
         <View style={styles.container}>
             <Text style={styles.heading}>Reset Password</Text>
-            <Image source={require('../../../assets/images/explit_logo.png')} style={styles.logo} />
+            <Image source={require('../../../../assets/images/explit_logo.png')} style={styles.logo} />
             <View style={styles.inputContainer}>
                 <TextInput placeholder=" Reset Password" placeholderTextColor="#ABB5B5"/>
             </View>
             <View style={styles.inputContainer}>
                 <TextInput placeholder="Confirm Password" placeholderTextColor="#ABB5B5"/>
             </View>
-            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('VerifyOtp')}>
+            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Login')}>
                 <Text>Login</Text>
             </TouchableOpacity>
         </View>

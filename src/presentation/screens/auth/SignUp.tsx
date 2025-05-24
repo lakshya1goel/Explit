@@ -78,7 +78,7 @@ const SignUpScreen = () => {
     return (
         <View style={styles.container}>
             <Text style={styles.heading}>Sign Up</Text>
-            <Image source={require('../../../assets/images/explit_logo.png')} style={styles.logo} />
+            <Image source={require('../../../../assets/images/explit_logo.png')} style={styles.logo} />
             <View style={styles.inputContainer}>
                 <TextInput placeholder="Email"
                 placeholderTextColor="#ABB5B5"
