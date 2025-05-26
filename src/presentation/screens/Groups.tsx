@@ -10,6 +10,7 @@ import { useCallback, useEffect } from 'react';
 import { fetchGroups, resetGroupState } from '../../store/slices/groupSlice';
 import showErrorMessage from '../components/ErrorDialog';
 import showSuccessMessage from '../components/SuccessDialog';
+import ws from '../../services/WebsocketService';
 
 const GroupScreen = () => {
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -123,7 +124,11 @@ const GroupScreen = () => {
                 contentContainerStyle={styles.listContent}
                 renderItem={({ item }) => {
                     return (
-                        <Pressable onPress={() => {navigation.navigate('Chat', {groupId: item.id});}} style={styles.card}>
+                        <Pressable onPress={() => {
+                            ws.joinGroup(Number(item.id));
+                            navigation.navigate('Chat', {groupId: item.id});
+                        }}
+                        style={styles.card}>
                             <View style={styles.avatar}>
                                 <Text style={styles.avatarText}>{item.name?.charAt(0).toUpperCase()}</Text>
                             </View>

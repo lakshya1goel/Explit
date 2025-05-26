@@ -36,12 +36,11 @@ class WebSocketService {
       };
     };
 
-    joinGroup = (groupId: number, userId: number) => {
+    joinGroup = (groupId: number) => {
         if (this.socket?.readyState === WebSocket.OPEN) {
           const message = JSON.stringify({
             type: 'join-group',
             body: 'Joining group',
-            sender: userId,
             group_id: groupId,
           });
           this.socket.send(message);
@@ -50,12 +49,11 @@ class WebSocketService {
         }
     };
 
-    sendMessage = (groupId: number, userId: number, content: string) => {
+    sendMessage = (groupId: number, content: string) => {
         if (this.socket?.readyState === WebSocket.OPEN) {
           const message = JSON.stringify({
             type: 'message',
             body: content,
-            sender: userId,
             group_id: groupId,
           });
           this.socket.send(message);
