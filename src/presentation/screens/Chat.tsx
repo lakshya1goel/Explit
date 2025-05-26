@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, ListRenderItem } from 'react-native';
 import theme from '../../styles/theme';
 import { NavigationProp, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { RootStackParamList } from '../../types';
+import ws from '../../services/WebsocketService';
 
 type MessageItem = {
   id: string;
@@ -27,6 +28,12 @@ const ChatScreen = () => {
   const route = useRoute<RouteProp<RootStackParamList, 'Chat'>>();
   const { groupId } = route.params;
 
+  useEffect(() => {
+    return () => {
+      ws.leaveGroup();
+    };
+  }, []);
+
   const sendMessage = () => {
     if (inputMessage.trim()) {
       const newMessage: MessageItem = {
@@ -36,6 +43,7 @@ const ChatScreen = () => {
         sender: 'self',
       };
       setMessages((prev) => [...prev, newMessage]);
+      ws.sendMessage(inputMessage);
       setInputMessage('');
     }
   };
