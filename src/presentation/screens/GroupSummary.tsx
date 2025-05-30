@@ -1,5 +1,6 @@
 import React from 'react';
 import {View, Text, StyleSheet, TouchableOpacity, Image, SafeAreaView} from 'react-native';
+import theme from '../../styles/theme';
 
 const GroupSummaryScreen = () => {
   return (
@@ -12,7 +13,7 @@ const GroupSummaryScreen = () => {
           <Text style={styles.subText}>Owed by you</Text>
         </View>
         <View style={styles.summaryBox}>
-          <Text style={[styles.amount, { color: '#00C853' }]}>₹0.00</Text>
+          <Text style={[styles.amount]}>₹0.00</Text>
           <Text style={styles.subText}>Owed to you</Text>
         </View>
       </View>
@@ -44,7 +45,7 @@ export default GroupSummaryScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: theme.colors.background[950],
     paddingHorizontal: 16,
   },
   header: {
@@ -57,7 +58,7 @@ const styles = StyleSheet.create({
   summaryContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    backgroundColor: '#121212',
+    backgroundColor: theme.colors.secondary[950],
     padding: 16,
     borderRadius: 12,
     marginBottom: 24,
@@ -84,7 +85,7 @@ const styles = StyleSheet.create({
   userRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1a1a1a',
+    backgroundColor: theme.colors.secondary[900],
     padding: 12,
     borderRadius: 10,
     marginBottom: 16,
@@ -118,7 +119,7 @@ const styles = StyleSheet.create({
     bottom: 30,
     left: 16,
     right: 16,
-    backgroundColor: '#2962FF',
+    backgroundColor: theme.colors.primary[500],
     paddingVertical: 14,
     borderRadius: 30,
     alignItems: 'center',

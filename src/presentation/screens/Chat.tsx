@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, ListRenderItem, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, ListRenderItem, ActivityIndicator, Image, Pressable } from 'react-native';
 import theme from '../../styles/theme';
 import { NavigationProp, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { RootStackParamList } from '../../types';
@@ -15,11 +15,9 @@ const ChatScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [messages, setMessages] = useState<MessageItem[]>();
   const [inputMessage, setInputMessage] = useState('');
-  const [isPreparingMessages, setIsPreparingMessages] = useState(true); // NEW
-
+  const [isPreparingMessages, setIsPreparingMessages] = useState(true);
   const route = useRoute<RouteProp<RootStackParamList, 'Chat'>>();
   const { groupId } = route.params;
-
   const dispatch = useDispatch<AppDispatch>();
   const { loading, success, data } = useSelector((state: RootState) => state.chat);
 
@@ -44,30 +42,28 @@ const ChatScreen = () => {
 
   useEffect(() => {
     const prepareMessages = async () => {
+      if (!success || !data) {return;}
       setIsPreparingMessages(true);
-      if (data?.expenses || data?.messages) {
-        const combined: MessageItem[] = [
-          ...(data.expenses || []).map((expense): MessageItem => ({
-            msg: null,
-            expense: expense,
-          })),
-          ...(data.messages || []).map((message): MessageItem => ({
-            msg: message,
-            expense: null,
-          })),
-        ];
-        combined.sort((a, b) => {
-          const dateA = new Date(a.msg?.created_at || a.expense?.created_at || '').getTime();
-          const dateB = new Date(b.msg?.created_at || b.expense?.created_at || '').getTime();
-          return dateA - dateB;
-        });
-        setMessages(combined);
-      }
+      const combined: MessageItem[] = [
+        ...(data.expenses || []).map((expense): MessageItem => ({
+          msg: null,
+          expense: expense,
+        })),
+        ...(data.messages || []).map((message): MessageItem => ({
+          msg: message,
+          expense: null,
+        })),
+      ];
+      combined.sort((a, b) => {
+        const dateA = new Date(a.msg?.created_at || a.expense?.created_at || '').getTime();
+        const dateB = new Date(b.msg?.created_at || b.expense?.created_at || '').getTime();
+        return dateA - dateB;
+      });
+      setMessages(combined);
       setIsPreparingMessages(false);
     };
-
     prepareMessages();
-  }, [data]);
+  }, [success, data]);
 
   useEffect(() => {
     if (success) {
@@ -158,6 +154,9 @@ const ChatScreen = () => {
     <View style={styles.container}>
       <View style={styles.appBar}>
         <Text style={styles.appBarText}>Group</Text>
+        <Pressable onPress={() => navigation.navigate('GroupSummary')}>
+          <Image source={require('../../../assets/icons/bill.png')} style={styles.bill} />
+        </Pressable>
       </View>
 
       {(loading || isPreparingMessages) ? (
@@ -200,6 +199,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   appBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     padding: 10,
     backgroundColor: theme.colors.background[950],
     elevation: 10,
@@ -210,6 +211,11 @@ const styles = StyleSheet.create({
       color: '#fff',
       fontSize: 20,
       fontWeight: 'bold',
+  },
+  bill: {
+    width: 30,
+    height: 30,
+    tintColor: '#fff',
   },
   receivedCard: {
     backgroundColor: theme.colors.secondary[950],
