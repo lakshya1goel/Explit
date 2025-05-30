@@ -1,9 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, ListRenderItem } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, ListRenderItem, ActivityIndicator } from 'react-native';
 import theme from '../../styles/theme';
 import { NavigationProp, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { RootStackParamList } from '../../types';
 import ws from '../../services/WebsocketService';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../store';
+import { fetchChatHistory, resetChatState } from '../../store/slices/chatSlics';
+import showErrorMessage from '../components/ErrorDialog';
+import showSuccessMessage from '../components/SuccessDialog';
 
 type MessageItem = {
   id: string;
@@ -27,6 +32,35 @@ const ChatScreen = () => {
   const [inputMessage, setInputMessage] = useState('');
   const route = useRoute<RouteProp<RootStackParamList, 'Chat'>>();
   const { groupId } = route.params;
+
+  const dispatch = useDispatch<AppDispatch>();
+  const { loading, success } = useSelector((state: RootState) => state.chat);
+
+  const handleFetcheHistory = useCallback(async () => {
+      try {
+        await dispatch(fetchChatHistory(Number(groupId))).unwrap();
+      } catch (err) {
+        console.log('Fetch chat history error:', err);
+        if (typeof err === 'string') {
+          showErrorMessage(err);
+        } else if (err instanceof Error) {
+          showErrorMessage(err.message);
+        } else {
+          showErrorMessage('Chat history fetching failed');
+        }
+      }
+  }, [dispatch, groupId]);
+
+  useEffect(() => {
+    handleFetcheHistory();
+  }, [handleFetcheHistory]);
+
+  useEffect(() => {
+    if (success) {
+        showSuccessMessage('Groups fetched successfully');
+        dispatch(resetChatState());
+    }
+  }, [success, dispatch]);
 
   useEffect(() => {
     return () => {
@@ -87,12 +121,19 @@ const ChatScreen = () => {
       <View style={styles.appBar}>
           <Text style={styles.appBarText}>Group</Text>
       </View>
+      {loading ? (
+        <ActivityIndicator
+            size="large"
+            color={theme.colors.primary[500]}
+            style={styles.loadingIndicator}
+        />
+      ) :
       <FlatList
         data={messages}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.contentContainerStyle}
-      />
+      />}
 
       <View style={styles.inputBar}>
         <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('SplitExpense', { groupId: groupId})}>
@@ -210,6 +251,11 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: 'white',
+  },
+  loadingIndicator: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

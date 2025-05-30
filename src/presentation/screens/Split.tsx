@@ -35,7 +35,7 @@ const SplitExpenseScreen = () => {
         }
     }, [success]);
 
-    const handleCreateGroup = async () => {
+    const handleCreateSplit = async () => {
         try {
           if (!details.title.trim() || details.amount.trim() === '') {
             showErrorMessage('Expense title is required');
@@ -98,7 +98,7 @@ const SplitExpenseScreen = () => {
                     color={theme.colors.primary[500]}
                     style={styles.loadingIndicator}
                 />
-            ) : <TouchableOpacity style={styles.actionButton} onPress={() => {handleCreateGroup();}}>
+            ) : <TouchableOpacity style={styles.actionButton} onPress={() => {handleCreateSplit();}}>
                 <Text style={styles.buttonText}>Save</Text>
             </TouchableOpacity>}
             </View>

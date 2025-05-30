@@ -50,7 +50,7 @@ class WebSocketService {
         console.log('WebSocket disconnected');
         this.socket = null;
         this.messageListener = null;
-        this.currentGroupId = null;
+        this.currentGroupId = 0;
       };
     };
 
@@ -94,7 +94,7 @@ class WebSocketService {
           });
           this.socket.send(message);
           console.log(`Leaving group ${this.currentGroupId}`);
-          this.currentGroupId = null;
+          this.currentGroupId = 0;
         } else {
           console.log('WebSocket not open. Cannot leave group.');
         }
