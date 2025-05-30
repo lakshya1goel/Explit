@@ -9,6 +9,7 @@ export interface ChatState {
 export interface History {
     id: string;
     name: string;
+    user_id: number;
     description: string;
     total_users: number;
     expenses: Expense[];
@@ -44,4 +45,9 @@ export interface FetchHistoryResponse {
     success: boolean;
     message: string;
     data: History;
+}
+
+export interface MessageItem {
+    msg: Message | null;
+    expense?: Expense | null;
 }
