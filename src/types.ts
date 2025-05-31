@@ -20,5 +20,7 @@ export type RootStackParamList = {
     SplitExpense: {
         groupId: string;
     };
-    GroupSummary: undefined;
+    GroupSummary: {
+        groupId: string;
+    };
 }

@@ -9,7 +9,6 @@ import { AppDispatch, RootState } from '../../store';
 import { useCallback, useEffect } from 'react';
 import { fetchGroups, resetGroupState } from '../../store/slices/groupSlice';
 import showErrorMessage from '../components/ErrorDialog';
-import showSuccessMessage from '../components/SuccessDialog';
 import ws from '../../services/WebsocketService';
 
 const GroupScreen = () => {
@@ -38,7 +37,6 @@ const GroupScreen = () => {
 
     useEffect(() => {
         if (success) {
-            showSuccessMessage('Groups fetched successfully');
             dispatch(resetGroupState());
         }
     }, [success, dispatch]);

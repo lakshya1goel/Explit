@@ -28,3 +28,9 @@ export interface GetSummaryResponse {
         settlements: Settlement[];
     };
 }
+
+export interface UserSummaryItem {
+    name: string;
+    amount: number;
+    expenses: number;
+}

@@ -8,7 +8,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store';
 import { fetchChatHistory, resetChatState } from '../../store/slices/chatSlics';
 import showErrorMessage from '../components/ErrorDialog';
-import showSuccessMessage from '../components/SuccessDialog';
 import { Message, MessageItem } from '../../store/types/chat';
 
 const ChatScreen = () => {
@@ -21,7 +20,7 @@ const ChatScreen = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { loading, success, data } = useSelector((state: RootState) => state.chat);
 
-  const handleFetcheHistory = useCallback(async () => {
+  const handleFetchHistory = useCallback(async () => {
     try {
       await dispatch(fetchChatHistory(Number(groupId))).unwrap();
     } catch (err) {
@@ -38,8 +37,8 @@ const ChatScreen = () => {
 
   useFocusEffect(
     useCallback(() => {
-      handleFetcheHistory();
-    }, [handleFetcheHistory])
+      handleFetchHistory();
+    }, [handleFetchHistory])
   );
 
   useEffect(() => {
@@ -69,7 +68,6 @@ const ChatScreen = () => {
 
   useEffect(() => {
     if (success) {
-      showSuccessMessage('Groups fetched successfully');
       dispatch(resetChatState());
     }
   }, [success, dispatch]);
@@ -155,8 +153,8 @@ const ChatScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.appBar}>
-        <Text style={styles.appBarText}>Group</Text>
-        <Pressable onPress={() => navigation.navigate('GroupSummary')}>
+        <Text style={styles.appBarText}>{data.name}</Text>
+        <Pressable onPress={() => navigation.navigate('GroupSummary', { groupId: groupId })}>
           <Image source={require('../../../assets/icons/bill.png')} style={styles.bill} />
         </Pressable>
       </View>
