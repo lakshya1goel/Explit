@@ -1,7 +1,7 @@
-import { ActivityIndicator, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Keyboard, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Text, TextInput } from 'react-native-gesture-handler';
 import theme from '../../styles/theme';
-import { RouteProp, useRoute } from '@react-navigation/native';
+import { NavigationProp, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { RootStackParamList } from '../../types';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store';
@@ -9,9 +9,10 @@ import React, { useEffect } from 'react';
 import showSuccessMessage from '../components/SuccessDialog';
 import showErrorMessage from '../components/ErrorDialog';
 import { SplitCreationPayload } from '../../store/types';
-import { createSplit } from '../../store/slices/splitSlice';
+import { createSplit, resetSplitState } from '../../store/slices/splitSlice';
 
 const SplitExpenseScreen = () => {
+    const navigation = useNavigation<NavigationProp<RootStackParamList>>();
     const route = useRoute<RouteProp<RootStackParamList, 'SplitExpense'>>();
     const { groupId } = route.params;
     const dispatch = useDispatch<AppDispatch>();
@@ -27,13 +28,12 @@ const SplitExpenseScreen = () => {
     useEffect(() => {
         if (success) {
           showSuccessMessage('Expense created successfully');
-          setDetails({
-            amount: '',
-            title: '',
-            desc: '',
-          });
+          setTimeout(() => navigation.goBack(), 500);
         }
-    }, [success]);
+        return () => {
+            dispatch(resetSplitState());
+        };
+    }, [success, navigation, dispatch]);
 
     const handleCreateSplit = async () => {
         try {
@@ -98,7 +98,15 @@ const SplitExpenseScreen = () => {
                     color={theme.colors.primary[500]}
                     style={styles.loadingIndicator}
                 />
-            ) : <TouchableOpacity style={styles.actionButton} onPress={() => {handleCreateSplit();}}>
+            ) : <TouchableOpacity style={styles.actionButton} onPress={() => {
+                    handleCreateSplit();
+                    setDetails({
+                        amount: '',
+                        title: '',
+                        desc: '',
+                    });
+                    Keyboard.dismiss();
+                }}>
                 <Text style={styles.buttonText}>Save</Text>
             </TouchableOpacity>}
             </View>

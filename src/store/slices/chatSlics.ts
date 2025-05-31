@@ -53,6 +53,7 @@ const initialState: ChatState = {
   data: {
     id: '',
     name: '',
+    user_id: 0,
     description: '',
     total_users: 0,
     expenses: [],

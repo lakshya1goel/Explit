@@ -3,6 +3,7 @@ import authReducer from './slices/authSlice';
 import groupReducer from './slices/groupSlice';
 import splitReducer from './slices/splitSlice';
 import chatReducer from './slices/chatSlics';
+import groupSummaryReducer from './slices/groupSummarySlice';
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     group: groupReducer,
     split: splitReducer,
     chat: chatReducer,
+    groupSummary: groupSummaryReducer,
   },
 });
 

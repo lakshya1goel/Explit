@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, ListRenderItem, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, ListRenderItem, ActivityIndicator, Image, Pressable } from 'react-native';
 import theme from '../../styles/theme';
-import { NavigationProp, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { NavigationProp, RouteProp, useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import { RootStackParamList } from '../../types';
 import ws from '../../services/WebsocketService';
 import { useDispatch, useSelector } from 'react-redux';
@@ -9,56 +9,68 @@ import { AppDispatch, RootState } from '../../store';
 import { fetchChatHistory, resetChatState } from '../../store/slices/chatSlics';
 import showErrorMessage from '../components/ErrorDialog';
 import showSuccessMessage from '../components/SuccessDialog';
-
-type MessageItem = {
-  id: string;
-  type: 'payment_sent' | 'payment_received' | 'text';
-  amount?: number;
-  date?: string;
-  message?: string;
-  sender?: 'self' | 'other';
-};
-
-const initialMessages: MessageItem[] = [
-  { id: '1', type: 'payment_sent', amount: 55, date: '3 Apr, 12:43 pm' },
-  { id: '3', type: 'payment_received', amount: 1500, date: '4 Apr, 9:04 am' },
-  { id: '4', type: 'text', message: 'Hey, did you send the amount?', sender: 'other' },
-  { id: '5', type: 'text', message: 'Yes, sent ₹55 just now.', sender: 'self' },
-];
+import { Message, MessageItem } from '../../store/types/chat';
 
 const ChatScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const [messages, setMessages] = useState<MessageItem[]>(initialMessages);
+  const [messages, setMessages] = useState<MessageItem[]>();
   const [inputMessage, setInputMessage] = useState('');
+  const [isPreparingMessages, setIsPreparingMessages] = useState(true);
   const route = useRoute<RouteProp<RootStackParamList, 'Chat'>>();
   const { groupId } = route.params;
-
   const dispatch = useDispatch<AppDispatch>();
-  const { loading, success } = useSelector((state: RootState) => state.chat);
+  const { loading, success, data } = useSelector((state: RootState) => state.chat);
 
   const handleFetcheHistory = useCallback(async () => {
-      try {
-        await dispatch(fetchChatHistory(Number(groupId))).unwrap();
-      } catch (err) {
-        console.log('Fetch chat history error:', err);
-        if (typeof err === 'string') {
-          showErrorMessage(err);
-        } else if (err instanceof Error) {
-          showErrorMessage(err.message);
-        } else {
-          showErrorMessage('Chat history fetching failed');
-        }
+    try {
+      await dispatch(fetchChatHistory(Number(groupId))).unwrap();
+    } catch (err) {
+      console.log('Fetch chat history error:', err);
+      if (typeof err === 'string') {
+        showErrorMessage(err);
+      } else if (err instanceof Error) {
+        showErrorMessage(err.message);
+      } else {
+        showErrorMessage('Chat history fetching failed');
       }
+    }
   }, [dispatch, groupId]);
 
+  useFocusEffect(
+    useCallback(() => {
+      handleFetcheHistory();
+    }, [handleFetcheHistory])
+  );
+
   useEffect(() => {
-    handleFetcheHistory();
-  }, [handleFetcheHistory]);
+    const prepareMessages = async () => {
+      if (!success || !data) {return;}
+      setIsPreparingMessages(true);
+      const combined: MessageItem[] = [
+        ...(data.expenses || []).map((expense): MessageItem => ({
+          msg: null,
+          expense: expense,
+        })),
+        ...(data.messages || []).map((message): MessageItem => ({
+          msg: message,
+          expense: null,
+        })),
+      ];
+      combined.sort((a, b) => {
+        const dateA = new Date(a.msg?.CreatedAt || a.expense?.CreatedAt || '').getTime();
+        const dateB = new Date(b.msg?.CreatedAt || b.expense?.CreatedAt || '').getTime();
+        return dateA - dateB;
+      });
+      setMessages(combined);
+      setIsPreparingMessages(false);
+    };
+    prepareMessages();
+  }, [success, data]);
 
   useEffect(() => {
     if (success) {
-        showSuccessMessage('Groups fetched successfully');
-        dispatch(resetChatState());
+      showSuccessMessage('Groups fetched successfully');
+      dispatch(resetChatState());
     }
   }, [success, dispatch]);
 
@@ -70,73 +82,104 @@ const ChatScreen = () => {
 
   const sendMessage = () => {
     if (inputMessage.trim()) {
-      const newMessage: MessageItem = {
-        id: Date.now().toString(),
+      const tempMessage: Message = {
+        ID: Date.now().toString(),
+        CreatedAt: new Date().toISOString(),
+        UpdatedAt: new Date().toISOString(),
+        DeletedAt: null,
         type: 'text',
-        message: inputMessage,
-        sender: 'self',
+        body: inputMessage,
+        sender: data?.user_id || 0,
+        group_id: Number(data?.id) || 0,
       };
-      setMessages((prev) => [...prev, newMessage]);
+      const newMessage: MessageItem = {
+        msg: tempMessage,
+        expense: null,
+      };
+      setMessages(prev => [...(prev || []), newMessage]);
       ws.sendMessage(inputMessage);
       setInputMessage('');
     }
   };
 
   const renderItem: ListRenderItem<MessageItem> = ({ item }) => {
-    switch (item.type) {
-      case 'payment_sent':
-        return (
-          <View style={styles.sentCard}>
-            <Text style={styles.label}>Payment Sent</Text>
-            <Text style={styles.amount}>₹{item.amount}</Text>
-            <Text style={styles.date}>Paid • {item.date}</Text>
-          </View>
-        );
-      case 'payment_received':
-        return (
-          <View style={styles.receivedCard}>
-            <Text style={styles.label}>Payment Received</Text>
-            <Text style={styles.amount}>₹{item.amount}</Text>
-            <Text style={styles.date}>Paid • {item.date}</Text>
-          </View>
-        );
-      case 'text':
-        return (
-          <View
-            style={[
-              styles.chatBubble,
-              item.sender === 'self' ? styles.selfChat : styles.otherChat,
-            ]}
-          >
-            <Text style={styles.chatText}>{item.message}</Text>
-          </View>
-        );
-      default:
-        return null;
+    if (item.expense) {
+      const expense = item.expense;
+      const isSelf = expense.user_id === data?.user_id;
+      const isPaid = expense.paid_by_count === data?.total_users ? 'Paid' : data?.total_users - expense.paid_by_count + ' Left';
+      return (
+        <View style={isSelf ? styles.sentCard : styles.receivedCard}>
+          <Text style={styles.label}>
+            {isSelf ? 'Payment Sent' : 'Payment Received'}
+          </Text>
+          <Text style={styles.amount}>₹{expense.amount}</Text>
+          <Text style={styles.date}>
+              {isPaid} • {new Date(expense.CreatedAt).toLocaleString('en-IN', {
+              day: 'numeric',
+              month: 'short',
+              hour: 'numeric',
+              minute: 'numeric',
+              hour12: true,
+            })}
+          </Text>
+        </View>
+      );
     }
+
+    if (item.msg) {
+      const msg = item.msg;
+      const isSelf = msg.sender === data?.user_id;
+      return (
+        <View
+          style={[
+            styles.chatBubble,
+            isSelf ? styles.selfChat : styles.otherChat,
+          ]}
+        >
+          <Text style={styles.chatText}>{msg.body}</Text>
+          <Text style={styles.date}>
+            {new Date(msg.CreatedAt).toLocaleString('en-IN', {
+              day: 'numeric',
+              month: 'short',
+              hour: 'numeric',
+              minute: 'numeric',
+              hour12: true,
+            })}
+          </Text>
+        </View>
+      );
+    }
+    return null;
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.appBar}>
-          <Text style={styles.appBarText}>Group</Text>
+        <Text style={styles.appBarText}>Group</Text>
+        <Pressable onPress={() => navigation.navigate('GroupSummary')}>
+          <Image source={require('../../../assets/icons/bill.png')} style={styles.bill} />
+        </Pressable>
       </View>
-      {loading ? (
+
+      {(loading || isPreparingMessages) ? (
         <ActivityIndicator
-            size="large"
-            color={theme.colors.primary[500]}
-            style={styles.loadingIndicator}
+          size="large"
+          color={theme.colors.primary[500]}
+          style={styles.loadingIndicator}
         />
-      ) :
-      <FlatList
-        data={messages}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        contentContainerStyle={styles.contentContainerStyle}
-      />}
+      ) : (
+        <FlatList
+          data={messages}
+          renderItem={renderItem}
+          contentContainerStyle={styles.contentContainerStyle}
+        />
+      )}
 
       <View style={styles.inputBar}>
-        <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('SplitExpense', { groupId: groupId})}>
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={() => navigation.navigate('SplitExpense', { groupId: groupId })}
+        >
           <Text style={styles.buttonText}>Split Expense</Text>
         </TouchableOpacity>
         <TextInput
@@ -158,6 +201,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   appBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     padding: 10,
     backgroundColor: theme.colors.background[950],
     elevation: 10,
@@ -168,6 +213,11 @@ const styles = StyleSheet.create({
       color: '#fff',
       fontSize: 20,
       fontWeight: 'bold',
+  },
+  bill: {
+    width: 30,
+    height: 30,
+    tintColor: '#fff',
   },
   receivedCard: {
     backgroundColor: theme.colors.secondary[950],
