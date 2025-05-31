@@ -17,10 +17,10 @@ export interface History {
 }
 
 export interface Expense {
-    id: string;
-    created_at: string;
-    updated_at: string;
-    deleted_at: string | null;
+    ID: string;
+    CreatedAt: string;
+    UpdatedAt: string;
+    DeletedAt: string | null;
     user_id: number;
     title: string;
     description: string;
@@ -31,10 +31,10 @@ export interface Expense {
 }
 
 export interface Message {
-    id: string;
-    created_at: string;
-    updated_at: string;
-    deleted_at: string | null;
+    ID: string;
+    CreatedAt: string;
+    UpdatedAt: string;
+    DeletedAt: string | null;
     type: string;
     body: string;
     sender: number;

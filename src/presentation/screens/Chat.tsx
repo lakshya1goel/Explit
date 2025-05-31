@@ -55,8 +55,8 @@ const ChatScreen = () => {
         })),
       ];
       combined.sort((a, b) => {
-        const dateA = new Date(a.msg?.created_at || a.expense?.created_at || '').getTime();
-        const dateB = new Date(b.msg?.created_at || b.expense?.created_at || '').getTime();
+        const dateA = new Date(a.msg?.CreatedAt || a.expense?.CreatedAt || '').getTime();
+        const dateB = new Date(b.msg?.CreatedAt || b.expense?.CreatedAt || '').getTime();
         return dateA - dateB;
       });
       setMessages(combined);
@@ -81,10 +81,10 @@ const ChatScreen = () => {
   const sendMessage = () => {
     if (inputMessage.trim()) {
       const tempMessage: Message = {
-        id: Date.now().toString(),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        deleted_at: null,
+        ID: Date.now().toString(),
+        CreatedAt: new Date().toISOString(),
+        UpdatedAt: new Date().toISOString(),
+        DeletedAt: null,
         type: 'text',
         body: inputMessage,
         sender: data?.user_id || 0,
@@ -104,7 +104,7 @@ const ChatScreen = () => {
     if (item.expense) {
       const expense = item.expense;
       const isSelf = expense.user_id === data?.user_id;
-      const isPaid = expense.paid_by_count === data?.total_users ? 'Paid' : data?.total_users - expense.paid_by_count + ' Pending';
+      const isPaid = expense.paid_by_count === data?.total_users ? 'Paid' : data?.total_users - expense.paid_by_count + ' Left';
       return (
         <View style={isSelf ? styles.sentCard : styles.receivedCard}>
           <Text style={styles.label}>
@@ -112,7 +112,7 @@ const ChatScreen = () => {
           </Text>
           <Text style={styles.amount}>₹{expense.amount}</Text>
           <Text style={styles.date}>
-              {isPaid} • {new Date(expense.created_at).toLocaleString('en-IN', {
+              {isPaid} • {new Date(expense.CreatedAt).toLocaleString('en-IN', {
               day: 'numeric',
               month: 'short',
               hour: 'numeric',
@@ -136,7 +136,7 @@ const ChatScreen = () => {
         >
           <Text style={styles.chatText}>{msg.body}</Text>
           <Text style={styles.date}>
-            {new Date(msg.created_at).toLocaleString('en-IN', {
+            {new Date(msg.CreatedAt).toLocaleString('en-IN', {
               day: 'numeric',
               month: 'short',
               hour: 'numeric',
