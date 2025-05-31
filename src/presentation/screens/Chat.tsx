@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, ListRenderItem, ActivityIndicator, Image, Pressable } from 'react-native';
 import theme from '../../styles/theme';
-import { NavigationProp, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { NavigationProp, RouteProp, useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import { RootStackParamList } from '../../types';
 import ws from '../../services/WebsocketService';
 import { useDispatch, useSelector } from 'react-redux';
@@ -36,9 +36,11 @@ const ChatScreen = () => {
     }
   }, [dispatch, groupId]);
 
-  useEffect(() => {
-    handleFetcheHistory();
-  }, [handleFetcheHistory]);
+  useFocusEffect(
+    useCallback(() => {
+      handleFetcheHistory();
+    }, [handleFetcheHistory])
+  );
 
   useEffect(() => {
     const prepareMessages = async () => {

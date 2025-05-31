@@ -55,7 +55,7 @@ const groupSlice = createSlice({
   name: 'split',
   initialState,
   reducers: {
-    resetGroupState: (state) => {
+    resetSplitState: (state) => {
       state.success = false;
       state.message = '';
     },
@@ -81,4 +81,4 @@ const groupSlice = createSlice({
 });
 
 export default groupSlice.reducer;
-export const { resetGroupState } = groupSlice.actions;
+export const { resetSplitState } = groupSlice.actions;
