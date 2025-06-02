@@ -20,6 +20,7 @@
     "react-native": "^0.79.1",
     "react-native-contacts": "^8.0.4",
     "react-native-dotenv": "^3.4.11",
+    "react-native-floating-action": "^1.22.0",
     "react-native-gesture-handler": "^2.25.0",
     "react-native-safe-area-context": "^5.4.0",
     "react-native-safe-area-view": "^1.1.1",

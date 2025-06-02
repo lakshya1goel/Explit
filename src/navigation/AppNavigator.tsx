@@ -13,6 +13,7 @@ import GroupSummaryScreen from '../presentation/screens/GroupSummary';
 import SplashScreen from '../presentation/screens/auth/Splash';
 import GroupScreen from '../presentation/screens/Groups';
 import SplitExpenseScreen from '../presentation/screens/Split';
+import HomeScreen from '../presentation/screens/Home';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -26,6 +27,7 @@ const AppNavigator = () => {
                 <Stack.Screen name="VerifyMail" component={VerifyMailScreen} />
                 <Stack.Screen name="VerifyMobile" component={VerifyMobileScreen} />
                 <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
+                <Stack.Screen name="Home" component={HomeScreen} />
                 <Stack.Screen name="Group" component={GroupScreen} />
                 <Stack.Screen name="Contact" component={ContactScreen} />
                 <Stack.Screen name="Chat" component={ChatScreen} />

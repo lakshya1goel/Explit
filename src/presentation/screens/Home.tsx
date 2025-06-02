@@ -12,7 +12,7 @@ import showErrorMessage from '../components/ErrorDialog';
 import ws from '../../services/WebsocketService';
 import { FloatingAction } from 'react-native-floating-action';
 
-const GroupScreen = () => {
+const HomeScreen = () => {
     const actions = [
         {
             text: 'Create Group',
@@ -112,39 +112,49 @@ const GroupScreen = () => {
             <View style={styles.appBar}>
                 <Text style={styles.appBarText}>Groups</Text>
             </View>
-            {/* <TextInput
-                style={styles.input}
-                placeholder="Search"
-                placeholderTextColor="#ABB5B5"
-                // value={details.groupTitle}
-                // onChangeText={(text) => setDetails({ ...details, groupTitle: text })}
-            /> */}
             {loading ? (
                 <ActivityIndicator
                     size="large"
                     color={theme.colors.primary[500]}
                     style={styles.loadingIndicator}
                 />
-            ) :
-            <FlatList
-                data={data}
-                keyExtractor={(item, index) => item.id || index.toString()}
-                contentContainerStyle={styles.listContent}
-                renderItem={({ item }) => {
-                    return (
-                        <Pressable onPress={() => {
-                            ws.joinGroup(Number(item.id));
-                            navigation.navigate('Chat', {groupId: item.id});
-                        }}
-                        style={styles.card}>
-                            <View style={styles.avatar}>
-                                <Text style={styles.avatarText}>{item.name?.charAt(0).toUpperCase()}</Text>
-                            </View>
-                            <Text style={styles.nameText}>{item.name}</Text>
-                        </Pressable>
-                    );
-                }}
-            />}
+            ) : (
+                <FlatList
+                    style={styles.list}
+                    data={[...data, { id: 'more', name: 'More' }]}
+                    keyExtractor={(item, index) => item.id || index.toString()}
+                    numColumns={4}
+                    renderItem={({ item }) => {
+                        if (item.id === 'more') {
+                            return (
+                                <Pressable
+                                    onPress={() => {
+                                        navigation.navigate('Group');
+                                    }}
+                                    style={styles.card}>
+                                    <View style={styles.avatar}>
+                                        <Text style={styles.avatarText}>→</Text>
+                                    </View>
+                                    <Text style={styles.nameText}>More</Text>
+                                </Pressable>
+                            );
+                        }
+                        return (
+                            <Pressable
+                                onPress={() => {
+                                    ws.joinGroup(Number(item.id));
+                                    navigation.navigate('Chat', { groupId: item.id });
+                                }}
+                                style={styles.card}>
+                                <View style={styles.avatar}>
+                                    <Text style={styles.avatarText}>{item.name?.charAt(0).toUpperCase()}</Text>
+                                </View>
+                                <Text style={styles.nameText}>{item.name}</Text>
+                            </Pressable>
+                        );
+                    }}
+                />
+            )}
             <FloatingAction
                 color={theme.colors.primary[500]}
                 distanceToEdge={20}
@@ -155,7 +165,6 @@ const GroupScreen = () => {
                         if (name === 'bt_group') {
                             requestContactPermission();
                         } else if (name === 'bt_expense') {
-                            // navigation.navigate('SplitExpense');
                         }
                     }
                 }
@@ -173,6 +182,8 @@ const styles = StyleSheet.create({
         padding: 10,
         backgroundColor: theme.colors.background[950],
         elevation: 10,
+        borderBottomWidth: 0.5,
+        borderBottomColor: theme.colors.secondary[300],
     },
     appBarText: {
         color: '#fff',
@@ -198,18 +209,12 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         color: '#fff',
     },
-    listContent: {
-        paddingVertical: 10,
-        // paddingHorizontal: 12,
+    list : {
+        justifyContent: 'center',
     },
     card: {
         padding: 15,
         marginVertical: 2,
-        borderBottomWidth: 0.5,
-        borderRadius: 10,
-        borderColor: theme.colors.secondary[900],
-        // backgroundColor: theme.colors.background[700],
-        flexDirection: 'row',
         alignItems: 'center',
     },
     avatar: {
@@ -219,7 +224,6 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.primary[500],
         justifyContent: 'center',
         alignItems: 'center',
-        marginRight: 12,
     },
     avatarText: {
         color: '#fff',
@@ -232,4 +236,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default GroupScreen;
+export default HomeScreen;

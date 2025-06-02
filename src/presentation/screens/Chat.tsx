@@ -218,14 +218,14 @@ const styles = StyleSheet.create({
     tintColor: '#fff',
   },
   receivedCard: {
-    backgroundColor: theme.colors.secondary[950],
+    backgroundColor: theme.colors.secondary[800],
     borderRadius: 12,
     width: '60%',
     padding: 15,
     marginVertical: 5,
   },
   sentCard: {
-    backgroundColor: theme.colors.primary[950],
+    backgroundColor: theme.colors.secondary[800],
     borderRadius: 12,
     width: '60%',
     padding: 15,
