@@ -86,6 +86,9 @@ const ContactScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.appBar}>
+          <Text style={styles.appBarText}>Select Contacts</Text>
+      </View>
+      <View>
         <TextInput
           style={styles.input}
           placeholder="Group Title"
@@ -151,13 +154,21 @@ const styles = StyleSheet.create({
   },
   appBar: {
     padding: 10,
-    backgroundColor: '#000',
+    backgroundColor: theme.colors.background[950],
     elevation: 10,
+    borderBottomWidth: 0.5,
+    borderBottomColor: theme.colors.secondary[300],
+  },
+  appBarText: {
+      color: '#fff',
+      fontSize: 20,
+      fontWeight: 'bold',
   },
   input: {
     backgroundColor: theme.colors.secondary[900],
     padding: 10,
     marginVertical: 5,
+    marginHorizontal: 10,
     borderRadius: 6,
     color: '#fff',
   },
@@ -166,10 +177,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   card: {
-    padding: 20,
-    marginVertical: 8,
-    borderRadius: 10,
-    backgroundColor: theme.colors.background[700],
+    paddingHorizontal: 10,
+    paddingVertical: 15,
+    marginVertical: 4,
+    borderBottomColor: theme.colors.secondary[900],
+    borderBottomWidth: 0.3,
   },
   selectedItem: {
     backgroundColor: theme.colors.background[400],

@@ -12,17 +12,25 @@ import showErrorMessage from '../components/ErrorDialog';
 import ws from '../../services/WebsocketService';
 import { FloatingAction } from 'react-native-floating-action';
 
-const GroupScreen = () => {
+const HomeScreen = () => {
     const actions = [
         {
             text: 'Create Group',
+            icon: require('../../../assets/icons/create_group.png'),
             name: 'bt_group',
             position: 2,
+            color: theme.colors.primary[500],
+            textBackground: 'transparent',
+            textColor: '#fff',
         },
         {
             text: 'Create Expense',
+            icon: require('../../../assets/icons/create_expense.png'),
             name: 'bt_expense',
             position: 1,
+            color: theme.colors.primary[500],
+            textBackground: 'transparent',
+            textColor: '#fff',
         },
     ];
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -110,41 +118,56 @@ const GroupScreen = () => {
         <View style={styles.container}>
             <StatusBar backgroundColor={theme.colors.background[950]} barStyle="light-content" />
             <View style={styles.appBar}>
-                <Text style={styles.appBarText}>Groups</Text>
+                <Text style={styles.appBarText}>Explit</Text>
             </View>
-            {/* <TextInput
-                style={styles.input}
-                placeholder="Search"
-                placeholderTextColor="#ABB5B5"
-                // value={details.groupTitle}
-                // onChangeText={(text) => setDetails({ ...details, groupTitle: text })}
-            /> */}
+            <View style={styles.monthlyExpense}/>
+            <View style={styles.expenses}>
+                <View style={styles.expense}/>
+                <View style={styles.expense}/>
+            </View>
+            <Text style={styles.heading}>Groups</Text>
             {loading ? (
                 <ActivityIndicator
                     size="large"
                     color={theme.colors.primary[500]}
                     style={styles.loadingIndicator}
                 />
-            ) :
-            <FlatList
-                data={data}
-                keyExtractor={(item, index) => item.id || index.toString()}
-                contentContainerStyle={styles.listContent}
-                renderItem={({ item }) => {
-                    return (
-                        <Pressable onPress={() => {
-                            ws.joinGroup(Number(item.id));
-                            navigation.navigate('Chat', {groupId: item.id});
-                        }}
-                        style={styles.card}>
-                            <View style={styles.avatar}>
-                                <Text style={styles.avatarText}>{item.name?.charAt(0).toUpperCase()}</Text>
-                            </View>
-                            <Text style={styles.nameText}>{item.name}</Text>
-                        </Pressable>
-                    );
-                }}
-            />}
+            ) : (
+                <FlatList
+                    data={(data.length > 11) ? [...data, { id: 'more', name: 'More' }] : data}
+                    keyExtractor={(item, index) => item.id || index.toString()}
+                    numColumns={4}
+                    renderItem={({ item }) => {
+                        if (item.id === 'more') {
+                            return (
+                                <Pressable
+                                    onPress={() => {
+                                        navigation.navigate('Group');
+                                    }}
+                                    style={styles.card}>
+                                    <View style={styles.avatar}>
+                                        <Text style={styles.avatarText}>→</Text>
+                                    </View>
+                                    <Text style={styles.nameText}>More</Text>
+                                </Pressable>
+                            );
+                        }
+                        return (
+                            <Pressable
+                                onPress={() => {
+                                    ws.joinGroup(Number(item.id));
+                                    navigation.navigate('Chat', { groupId: item.id });
+                                }}
+                                style={styles.card}>
+                                <View style={styles.avatar}>
+                                    <Text style={styles.avatarText}>{item.name?.charAt(0).toUpperCase()}</Text>
+                                </View>
+                                <Text style={styles.nameText}>{item.name}</Text>
+                            </Pressable>
+                        );
+                    }}
+                />
+            )}
             <FloatingAction
                 color={theme.colors.primary[500]}
                 distanceToEdge={20}
@@ -155,7 +178,6 @@ const GroupScreen = () => {
                         if (name === 'bt_group') {
                             requestContactPermission();
                         } else if (name === 'bt_expense') {
-                            // navigation.navigate('SplitExpense');
                         }
                     }
                 }
@@ -173,6 +195,8 @@ const styles = StyleSheet.create({
         padding: 10,
         backgroundColor: theme.colors.background[950],
         elevation: 10,
+        borderBottomWidth: 0.5,
+        borderBottomColor: theme.colors.secondary[300],
     },
     appBarText: {
         color: '#fff',
@@ -190,26 +214,35 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    input: {
+    monthlyExpense: {
+        height: 100,
         backgroundColor: theme.colors.secondary[900],
-        padding: 15,
-        marginVertical: 5,
-        marginHorizontal: 5,
         borderRadius: 20,
-        color: '#fff',
+        margin: 10,
+        marginBottom: 10,
     },
-    listContent: {
-        paddingVertical: 10,
-        // paddingHorizontal: 12,
+    expenses : {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingHorizontal: 10,
+        marginBottom: 10,
+    },
+    expense : {
+        width: '48%',
+        height: 100,
+        backgroundColor: theme.colors.secondary[900],
+        borderRadius: 20,
+        marginBottom: 10,
+        justifyContent: 'center',
+    },
+    heading: {
+        color: '#fff',
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginLeft: 10,
     },
     card: {
-        padding: 15,
-        marginVertical: 2,
-        borderBottomWidth: 0.5,
-        borderRadius: 10,
-        borderColor: theme.colors.secondary[900],
-        // backgroundColor: theme.colors.background[700],
-        flexDirection: 'row',
+        padding: 20,
         alignItems: 'center',
     },
     avatar: {
@@ -219,7 +252,6 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.primary[500],
         justifyContent: 'center',
         alignItems: 'center',
-        marginRight: 12,
     },
     avatarText: {
         color: '#fff',
@@ -232,4 +264,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default GroupScreen;
+export default HomeScreen;

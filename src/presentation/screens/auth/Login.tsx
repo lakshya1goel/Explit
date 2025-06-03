@@ -47,7 +47,7 @@ const LoginScreen = () => {
                         refreshExpTime: refreshExpTime.getTime(),
                     });
                     showSuccessMessage('Login Successful!');
-                    navigation.navigate('Group');
+                    navigation.navigate('Home');
                 } catch (error) {
                     showErrorMessage('Failed to save authentication tokens');
                 }

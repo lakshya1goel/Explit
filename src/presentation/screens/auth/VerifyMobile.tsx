@@ -38,7 +38,7 @@ const VerifyMobileScreen = () => {
                         refreshExpTime: refreshExpTime.getTime(),
                     });
                     showSuccessMessage('Mobile Verified!');
-                    navigation.navigate('Group');
+                    navigation.navigate('Home');
                 } catch (error) {
                     showErrorMessage('Failed to save authentication tokens');
                 }
