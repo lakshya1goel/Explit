@@ -110,8 +110,10 @@ const HomeScreen = () => {
         <View style={styles.container}>
             <StatusBar backgroundColor={theme.colors.background[950]} barStyle="light-content" />
             <View style={styles.appBar}>
-                <Text style={styles.appBarText}>Groups</Text>
+                <Text style={styles.appBarText}>Explit</Text>
             </View>
+            <View style={styles.mpnthlyExpense}/>
+            <Text style={styles.heading}>Groups</Text>
             {loading ? (
                 <ActivityIndicator
                     size="large"
@@ -120,8 +122,7 @@ const HomeScreen = () => {
                 />
             ) : (
                 <FlatList
-                    style={styles.list}
-                    data={[...data, { id: 'more', name: 'More' }]}
+                    data={(data.length > 11) ? [...data, { id: 'more', name: 'More' }] : data}
                     keyExtractor={(item, index) => item.id || index.toString()}
                     numColumns={4}
                     renderItem={({ item }) => {
@@ -201,20 +202,21 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    input: {
+    mpnthlyExpense: {
+        height: 200,
         backgroundColor: theme.colors.secondary[900],
-        padding: 15,
-        marginVertical: 5,
-        marginHorizontal: 5,
         borderRadius: 20,
-        color: '#fff',
+        margin: 10,
+        marginBottom: 20,
     },
-    list : {
-        justifyContent: 'center',
+    heading: {
+        color: '#fff',
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginLeft: 10,
     },
     card: {
-        padding: 15,
-        marginVertical: 2,
+        padding: 20,
         alignItems: 'center',
     },
     avatar: {

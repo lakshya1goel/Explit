@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     },
     input: {
         backgroundColor: theme.colors.secondary[900],
-        height: 50,
+        height: 60,
         padding: 10,
         marginVertical: 10,
         marginHorizontal: 15,
