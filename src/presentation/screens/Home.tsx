@@ -16,13 +16,21 @@ const HomeScreen = () => {
     const actions = [
         {
             text: 'Create Group',
+            icon: require('../../../assets/icons/create_group.png'),
             name: 'bt_group',
             position: 2,
+            color: theme.colors.primary[500],
+            textBackground: 'transparent',
+            textColor: '#fff',
         },
         {
             text: 'Create Expense',
+            icon: require('../../../assets/icons/create_expense.png'),
             name: 'bt_expense',
             position: 1,
+            color: theme.colors.primary[500],
+            textBackground: 'transparent',
+            textColor: '#fff',
         },
     ];
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -112,7 +120,11 @@ const HomeScreen = () => {
             <View style={styles.appBar}>
                 <Text style={styles.appBarText}>Explit</Text>
             </View>
-            <View style={styles.mpnthlyExpense}/>
+            <View style={styles.monthlyExpense}/>
+            <View style={styles.expenses}>
+                <View style={styles.expense}/>
+                <View style={styles.expense}/>
+            </View>
             <Text style={styles.heading}>Groups</Text>
             {loading ? (
                 <ActivityIndicator
@@ -202,12 +214,26 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    mpnthlyExpense: {
-        height: 200,
+    monthlyExpense: {
+        height: 100,
         backgroundColor: theme.colors.secondary[900],
         borderRadius: 20,
         margin: 10,
-        marginBottom: 20,
+        marginBottom: 10,
+    },
+    expenses : {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingHorizontal: 10,
+        marginBottom: 10,
+    },
+    expense : {
+        width: '48%',
+        height: 100,
+        backgroundColor: theme.colors.secondary[900],
+        borderRadius: 20,
+        marginBottom: 10,
+        justifyContent: 'center',
     },
     heading: {
         color: '#fff',
