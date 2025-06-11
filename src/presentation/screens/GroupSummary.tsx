@@ -45,6 +45,13 @@ const GroupSummaryScreen = () => {
     const prepareList = async () => {
       if (!success || !data) {return;}
       setIsPreparingList(true);
+      if (!data.settlements || data.settlements.length === 0) {
+        setOwedToList([]);
+        setOwedByList([]);
+        setSettledList([]);
+        setIsPreparingList(false);
+        return;
+      }
       const owedToListFiltered: UserSummaryItem[] = data.settlements
       .filter((item) => item.settlement > 0)
       .map((item) => ({

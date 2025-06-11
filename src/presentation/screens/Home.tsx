@@ -1,7 +1,7 @@
 import { ActivityIndicator, Alert, Linking, PermissionsAndroid, Pressable, StatusBar, StyleSheet, View } from 'react-native';
 import { FlatList, Text } from 'react-native-gesture-handler';
 import theme from '../../styles/theme';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { NavigationProp, useFocusEffect, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../types';
 import Contacts from 'react-native-contacts/src/NativeContacts';
 import { useDispatch, useSelector } from 'react-redux';
@@ -43,7 +43,7 @@ const HomeScreen = () => {
         } catch (err) {
           console.log('Fetch groups error:', err);
           if (typeof err === 'string') {
-            showErrorMessage(err);
+            console.log('Error fetching groups:', err);
           } else if (err instanceof Error) {
             showErrorMessage(err.message);
           } else {
@@ -52,9 +52,11 @@ const HomeScreen = () => {
         }
     }, [dispatch]);
 
-    useEffect(() => {
-        handleFetcheGroups();
-    }, [handleFetcheGroups]);
+    useFocusEffect(
+        useCallback(() => {
+            handleFetcheGroups();
+        }, [handleFetcheGroups])
+    );
 
     useEffect(() => {
         if (success) {
@@ -120,11 +122,35 @@ const HomeScreen = () => {
             <View style={styles.appBar}>
                 <Text style={styles.appBarText}>Explit</Text>
             </View>
-            <View style={styles.monthlyExpense}/>
-            <View style={styles.expenses}>
-                <View style={styles.expense}/>
-                <View style={styles.expense}/>
+            <View style={styles.monthlyExpense}>
+                <Text style={styles.monthlyExpenseHeading}>Monthy Analysis</Text>
+                <View style={styles.summaryContainer}>
+                    <View style={styles.summaryBox}>
+                        <Text style={styles.owedByAmount}>₹{100}</Text>
+                        <Text style={styles.subText}>Owed by you</Text>
+                    </View>
+                    <View style={styles.summaryBox}>
+                        <Text style={styles.owedToAmount}>₹{700}</Text>
+                        <Text style={styles.subText}>Owed to you</Text>
+                    </View>
+                </View>
+                <Text style={styles.personalExpense}>Personal Expenses: ₹{100}</Text>
+
             </View>
+            <View style={styles.expenses}>
+                <View style={styles.expense}>
+                    <Text style={styles.personalExpense}>Weekly Personal Expenses</Text>
+                    <Text style={styles.personalExpense}>₹{100}</Text>
+                </View>
+                <View style={styles.expense}>
+                    <Text style={styles.personalExpense}>Daily Personal Expenses</Text>
+                    <Text style={styles.personalExpense}>₹{700}</Text>
+                </View>
+            </View>
+            <Pressable style={styles.viewPersonalExpense}>
+                <Text style={styles.personalExpenseButtonText}>View Personal Expenses</Text>
+                <Text style={styles.personalExpenseButtonText}>{'>'}</Text>
+            </Pressable>
             <Text style={styles.heading}>Groups</Text>
             {loading ? (
                 <ActivityIndicator
@@ -133,8 +159,13 @@ const HomeScreen = () => {
                     style={styles.loadingIndicator}
                 />
             ) : (
+                data.length === 0 ? (
+                    <View style={styles.loadingIndicator}>
+                        <Text style={{ color: '#fff' }}>No groups found</Text>
+                    </View>
+                ) :
                 <FlatList
-                    data={(data.length > 11) ? [...data, { id: 'more', name: 'More' }] : data}
+                    data={(data.length > 11) ? [...data.slice(0, 11), { id: 'more', name: 'More' }] : data}
                     keyExtractor={(item, index) => item.id || index.toString()}
                     numColumns={4}
                     renderItem={({ item }) => {
@@ -162,13 +193,18 @@ const HomeScreen = () => {
                                 <View style={styles.avatar}>
                                     <Text style={styles.avatarText}>{item.name?.charAt(0).toUpperCase()}</Text>
                                 </View>
-                                <Text style={styles.nameText}>{item.name}</Text>
+                                <Text style={styles.nameText}>
+                                    {item.name.length > 20
+                                        ? item.name.slice(0, 7) + '...'
+                                        : item.name}
+                                </Text>
                             </Pressable>
                         );
                     }}
                 />
             )}
             <FloatingAction
+                overlayColor="rgba(0, 0, 0, 0.8)"
                 color={theme.colors.primary[500]}
                 distanceToEdge={20}
                 actions={actions}
@@ -215,11 +251,22 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     monthlyExpense: {
-        height: 100,
+        height: 125,
         backgroundColor: theme.colors.secondary[900],
         borderRadius: 20,
         margin: 10,
         marginBottom: 10,
+    },
+    monthlyExpenseHeading: {
+        color: '#fff',
+        fontSize: 20,
+        textAlign: 'center',
+        marginBottom: 10,
+    },
+    personalExpense: {
+        fontSize: 16,
+        color: '#fff',
+        textAlign: 'center',
     },
     expenses : {
         flexDirection: 'row',
@@ -229,11 +276,29 @@ const styles = StyleSheet.create({
     },
     expense : {
         width: '48%',
-        height: 100,
+        height: 85,
         backgroundColor: theme.colors.secondary[900],
         borderRadius: 20,
         marginBottom: 10,
         justifyContent: 'center',
+    },
+    viewPersonalExpense: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        borderTopColor: theme.colors.primary[300],
+        borderBottomColor: theme.colors.primary[300],
+        borderTopWidth: 0.5,
+        borderBottomWidth: 0.5,
+        marginBottom: 10,
+
+    },
+    personalExpenseButtonText: {
+        color: theme.colors.primary[500],
+        fontSize: 16,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginHorizontal: 15,
+        marginVertical: 10,
     },
     heading: {
         color: '#fff',
@@ -249,7 +314,7 @@ const styles = StyleSheet.create({
         width: 50,
         height: 50,
         borderRadius: 20,
-        backgroundColor: theme.colors.primary[500],
+        backgroundColor: theme.colors.primary[800],
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -261,6 +326,30 @@ const styles = StyleSheet.create({
     nameText: {
         fontWeight: 'bold',
         color: '#fff',
+    },
+    summaryContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 10,
+    },
+    summaryBox: {
+        flex: 1,
+        alignItems: 'center',
+    },
+    owedByAmount: {
+        color: '#fff',
+        fontSize: 20,
+        fontWeight: 'bold',
+    },
+    owedToAmount: {
+        color: theme.colors.success[500],
+        fontSize: 20,
+        fontWeight: 'bold',
+    },
+    subText: {
+        color: '#fff',
+        fontSize: 13,
+        marginTop: 4,
     },
 });
 

@@ -42,7 +42,7 @@ const SplashScreen = () => {
     <View style={styles.container}>
       <Image source={require('../../../../assets/images/explit_logo.png')} style={styles.logo} />
       <Text style={styles.heading}>Explit</Text>
-      {loading && <ActivityIndicator size="large" color="#6366f1" />}
+      {loading && <ActivityIndicator size="large" color={theme.colors.primary[500]} />}
     </View>
   );
 };
