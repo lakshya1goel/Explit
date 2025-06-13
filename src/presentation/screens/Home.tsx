@@ -1,4 +1,4 @@
-import { ActivityIndicator, Alert, Linking, PermissionsAndroid, Pressable, StatusBar, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, Linking, PermissionsAndroid, Pressable, StatusBar, StyleSheet, View } from 'react-native';
 import { FlatList, Text } from 'react-native-gesture-handler';
 import theme from '../../styles/theme';
 import { NavigationProp, useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -118,37 +118,35 @@ const HomeScreen = () => {
 
     return (
         <View style={styles.container}>
-            <StatusBar backgroundColor={theme.colors.background[950]} barStyle="light-content" />
+            <StatusBar backgroundColor={theme.colors.background[700]} barStyle="light-content" />
             <View style={styles.appBar}>
                 <Text style={styles.appBarText}>Explit</Text>
             </View>
             <View style={styles.monthlyExpense}>
-                <Text style={styles.monthlyExpenseHeading}>Monthy Analysis</Text>
-                <View style={styles.summaryContainer}>
-                    <View style={styles.summaryBox}>
-                        <Text style={styles.owedByAmount}>₹{100}</Text>
-                        <Text style={styles.subText}>Owed by you</Text>
-                    </View>
-                    <View style={styles.summaryBox}>
-                        <Text style={styles.owedToAmount}>₹{700}</Text>
-                        <Text style={styles.subText}>Owed to you</Text>
+                <View style={styles.analysisHeader}>
+                    <Text style={styles.monthlyExpenseHeading}>Analysis</Text>
+                    <View style={styles.analysisTypeConatiner}>
+                        <Text style={styles.analysisTypeText}>Monthly</Text>
+                        <Text style={styles.analysisTypeText}>Weekly</Text>
+                        <Text style={styles.analysisTypeText}>Daily</Text>
                     </View>
                 </View>
-                <Text style={styles.personalExpense}>Personal Expenses: ₹{100}</Text>
-
-            </View>
-            <View style={styles.expenses}>
-                <View style={styles.expense}>
-                    <Text style={styles.personalExpense}>Weekly Personal Expenses</Text>
-                    <Text style={styles.personalExpense}>₹{100}</Text>
-                </View>
-                <View style={styles.expense}>
-                    <Text style={styles.personalExpense}>Daily Personal Expenses</Text>
-                    <Text style={styles.personalExpense}>₹{700}</Text>
+                <View style={styles.analysisFooter}>
+                    <View>
+                        <Text style={styles.amtTextStyle}>Owed by you</Text>
+                        <Text style={styles.amtTextStyle}>Owed to you</Text>
+                        <Text style={styles.amtTextStyle}>Personal expense</Text>
+                    </View>
+                    <View style={styles.amtStyle}>
+                        <Text style={styles.amtTextStyle}>$100</Text>
+                        <Text style={styles.amtTextStyle}>$500</Text>
+                        <Text style={styles.amtTextStyle}>$10000</Text>
+                    </View>
+                    <Image source={require('../../../assets/images/analysis.png')} style={styles.img}/>
                 </View>
             </View>
             <Pressable style={styles.viewPersonalExpense}>
-                <Text style={styles.personalExpenseButtonText}>View Personal Expenses</Text>
+                <Text style={styles.personalExpenseButtonText}>Personal Expenses</Text>
                 <Text style={styles.personalExpenseButtonText}>{'>'}</Text>
             </Pressable>
             <Text style={styles.heading}>Groups</Text>
@@ -224,12 +222,12 @@ const HomeScreen = () => {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: theme.colors.background[950],
+        backgroundColor: theme.colors.background[700],
         flex: 1,
     },
     appBar: {
         padding: 10,
-        backgroundColor: theme.colors.background[950],
+        backgroundColor: theme.colors.background[700],
         elevation: 10,
         borderBottomWidth: 0.5,
         borderBottomColor: theme.colors.secondary[300],
@@ -250,9 +248,15 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    analysisHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 10,
+    },
     monthlyExpense: {
-        height: 125,
-        backgroundColor: theme.colors.secondary[900],
+        height: 150,
+        backgroundColor: theme.colors.background[100],
         borderRadius: 20,
         margin: 10,
         marginBottom: 10,
@@ -260,40 +264,58 @@ const styles = StyleSheet.create({
     monthlyExpenseHeading: {
         color: '#fff',
         fontSize: 20,
-        textAlign: 'center',
-        marginBottom: 10,
+        margin: 10,
     },
-    personalExpense: {
-        fontSize: 16,
-        color: '#fff',
-        textAlign: 'center',
-    },
-    expenses : {
+    analysisTypeConatiner: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        paddingHorizontal: 10,
-        marginBottom: 10,
+        marginHorizontal: 10,
+        paddingVertical: 10,
     },
-    expense : {
-        width: '48%',
-        height: 85,
-        backgroundColor: theme.colors.secondary[900],
-        borderRadius: 20,
-        marginBottom: 10,
+    analysisTypeText: {
+        color: '#fff',
+        fontSize: 12,
+        paddingVertical: 4,
+        marginHorizontal: 5,
+        width: 60,
+        borderRadius: 10,
+        backgroundColor: theme.colors.primary[500],
+        textAlign: 'center',
+        textAlignVertical: 'center',
+    },
+    analysisFooter: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        paddingVertical: 5,
+    },
+    amtStyle: {
+        flexDirection: 'column',
+        alignItems: 'flex-end',
         justifyContent: 'center',
+        marginLeft: 10,
+    },
+    amtTextStyle: {
+        color: '#fff',
+        fontSize: 16,
+    },
+    img: {
+        width: 100,
+        height: 100,
+        resizeMode: 'contain',
+        marginLeft: 10,
     },
     viewPersonalExpense: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        borderTopColor: theme.colors.primary[300],
-        borderBottomColor: theme.colors.primary[300],
-        borderTopWidth: 0.5,
-        borderBottomWidth: 0.5,
-        marginBottom: 10,
-
+        backgroundColor: theme.colors.background[100],
+        borderRadius: 20,
+        margin: 10,
+        padding: 10,
     },
     personalExpenseButtonText: {
-        color: theme.colors.primary[500],
+        color: '#fff',
         fontSize: 16,
         fontWeight: 'bold',
         textAlign: 'center',
@@ -304,7 +326,7 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 20,
         fontWeight: 'bold',
-        marginLeft: 10,
+        marginHorizontal: 20,
     },
     card: {
         padding: 20,
@@ -314,7 +336,7 @@ const styles = StyleSheet.create({
         width: 50,
         height: 50,
         borderRadius: 20,
-        backgroundColor: theme.colors.primary[800],
+        backgroundColor: theme.colors.primary[600],
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -326,30 +348,6 @@ const styles = StyleSheet.create({
     nameText: {
         fontWeight: 'bold',
         color: '#fff',
-    },
-    summaryContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 10,
-    },
-    summaryBox: {
-        flex: 1,
-        alignItems: 'center',
-    },
-    owedByAmount: {
-        color: '#fff',
-        fontSize: 20,
-        fontWeight: 'bold',
-    },
-    owedToAmount: {
-        color: theme.colors.success[500],
-        fontSize: 20,
-        fontWeight: 'bold',
-    },
-    subText: {
-        color: '#fff',
-        fontSize: 13,
-        marginTop: 4,
     },
 });
 
