@@ -79,6 +79,7 @@ const ChatScreen = () => {
   }, []);
 
   const sendMessage = () => {
+    console.log('Sending message:', inputMessage);
     if (inputMessage.trim()) {
       const tempMessage: Message = {
         ID: Date.now().toString(),
@@ -195,14 +196,14 @@ const ChatScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: theme.colors.background[950],
+    backgroundColor: theme.colors.background[700],
     flex: 1,
   },
   appBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     padding: 10,
-    backgroundColor: theme.colors.background[950],
+    backgroundColor: theme.colors.background[700],
     elevation: 10,
     borderBottomWidth: 0.5,
     borderBottomColor: theme.colors.secondary[300],
@@ -218,14 +219,14 @@ const styles = StyleSheet.create({
     tintColor: '#fff',
   },
   receivedCard: {
-    backgroundColor: theme.colors.primary[950],
+    backgroundColor: theme.colors.primary[900],
     borderRadius: 12,
     width: '60%',
     padding: 15,
     marginVertical: 5,
   },
   sentCard: {
-    backgroundColor: theme.colors.primary[950],
+    backgroundColor: theme.colors.primary[900],
     borderRadius: 12,
     width: '60%',
     padding: 15,
@@ -265,7 +266,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 0,
   },
   otherChat: {
-    backgroundColor: theme.colors.secondary[950],
+    backgroundColor: theme.colors.secondary[900],
     alignSelf: 'flex-start',
     borderTopLeftRadius: 0,
   },

@@ -150,11 +150,11 @@ const ContactScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1 ,
-    backgroundColor: theme.colors.background[950],
+    backgroundColor: theme.colors.background[700],
   },
   appBar: {
     padding: 10,
-    backgroundColor: theme.colors.background[950],
+    backgroundColor: theme.colors.background[700],
     elevation: 10,
     borderBottomWidth: 0.5,
     borderBottomColor: theme.colors.secondary[300],

@@ -182,11 +182,11 @@ export default GroupSummaryScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background[950],
+    backgroundColor: theme.colors.background[700],
   },
   appBar: {
     padding: 10,
-    backgroundColor: theme.colors.background[950],
+    backgroundColor: theme.colors.background[700],
     elevation: 10,
     borderBottomWidth: 0.5,
     borderBottomColor: theme.colors.secondary[300],
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
   summaryContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    backgroundColor: theme.colors.secondary[950],
+    backgroundColor: theme.colors.secondary[900],
     padding: 16,
     borderRadius: 12,
     marginBottom: 24,

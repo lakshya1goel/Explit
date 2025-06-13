@@ -6,6 +6,7 @@ import { WEBSOCKET_URL } from '@env';
 
 const App = () => {
   useEffect(() => {
+    console.log('Connecting to WebSocket at:', WEBSOCKET_URL);
     ws.connect(WEBSOCKET_URL);
 
     return () => {

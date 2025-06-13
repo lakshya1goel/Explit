@@ -108,7 +108,7 @@ const GroupScreen = () => {
 
     return (
         <View style={styles.container}>
-            <StatusBar backgroundColor={theme.colors.background[950]} barStyle="light-content" />
+            <StatusBar backgroundColor={theme.colors.background[700]} barStyle="light-content" />
             <View style={styles.appBar}>
                 <Text style={styles.appBarText}>Groups</Text>
             </View>
@@ -166,12 +166,12 @@ const GroupScreen = () => {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: theme.colors.background[950],
+        backgroundColor: theme.colors.background[700],
         flex: 1,
     },
     appBar: {
         padding: 10,
-        backgroundColor: theme.colors.background[950],
+        backgroundColor: theme.colors.background[700],
         elevation: 10,
     },
     appBarText: {

@@ -5,7 +5,7 @@ import AuthService from '../../services/AuthService';
 import { SplitCreationPayload, SplitCreationResponse, SplitState } from '../types/split';
 
 const api = axios.create({
-  baseURL: BASE_URL || 'http://192.168.111.248:8000/api/',
+  baseURL: BASE_URL || 'http://140.40.0.118:8000/api/',
   headers: {
     'Content-Type': 'application/json',
   },
