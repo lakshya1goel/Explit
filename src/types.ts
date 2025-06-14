@@ -24,4 +24,6 @@ export type RootStackParamList = {
     GroupSummary: {
         groupId: string;
     };
+    PersonalExpense: undefined;
+    CreatePersonalExpense: undefined;
 }

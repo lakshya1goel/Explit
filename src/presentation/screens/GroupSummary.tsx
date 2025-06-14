@@ -170,9 +170,9 @@ const GroupSummaryScreen = () => {
           )}
         </>
       )}
-      <TouchableOpacity style={styles.settleButton}>
+      {/* <TouchableOpacity style={styles.settleButton}>
         <Text style={styles.settleText}>Settle up</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 };

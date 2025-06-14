@@ -39,16 +39,16 @@ const HomeScreen = () => {
 
     const handleFetcheGroups = useCallback(async () => {
         try {
-          await dispatch(fetchGroups()).unwrap();
-        } catch (err) {
-          console.log('Fetch groups error:', err);
-          if (typeof err === 'string') {
-            console.log('Error fetching groups:', err);
-          } else if (err instanceof Error) {
-            showErrorMessage(err.message);
-          } else {
-            showErrorMessage('Groups fetching failed');
-          }
+                await dispatch(fetchGroups()).unwrap();
+            } catch (err) {
+                console.log('Fetch groups error:', err);
+            if (typeof err === 'string') {
+                console.log('Error fetching groups:', err);
+            } else if (err instanceof Error) {
+                showErrorMessage(err.message);
+            } else {
+                showErrorMessage('Groups fetching failed');
+            }
         }
     }, [dispatch]);
 
@@ -138,14 +138,16 @@ const HomeScreen = () => {
                         <Text style={styles.amtTextStyle}>Personal expense</Text>
                     </View>
                     <View style={styles.amtStyle}>
-                        <Text style={styles.amtTextStyle}>$100</Text>
-                        <Text style={styles.amtTextStyle}>$500</Text>
-                        <Text style={styles.amtTextStyle}>$10000</Text>
+                        <Text style={styles.amtTextStyle}>₹100</Text>
+                        <Text style={styles.amtTextStyle}>₹500</Text>
+                        <Text style={styles.amtTextStyle}>₹10000</Text>
                     </View>
                     <Image source={require('../../../assets/images/analysis.png')} style={styles.img}/>
                 </View>
             </View>
-            <Pressable style={styles.viewPersonalExpense}>
+            <Pressable style={styles.viewPersonalExpense} onPress={() => {
+                navigation.navigate('PersonalExpense');
+            }}>
                 <Text style={styles.personalExpenseButtonText}>Personal Expenses</Text>
                 <Text style={styles.personalExpenseButtonText}>{'>'}</Text>
             </Pressable>
@@ -212,6 +214,7 @@ const HomeScreen = () => {
                         if (name === 'bt_group') {
                             requestContactPermission();
                         } else if (name === 'bt_expense') {
+                            navigation.navigate('CreatePersonalExpense');
                         }
                     }
                 }
