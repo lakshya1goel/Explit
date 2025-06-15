@@ -51,7 +51,7 @@ const initialState: SplitState = {
   message: '',
 };
 
-const groupSlice = createSlice({
+const splitSlice = createSlice({
   name: 'split',
   initialState,
   reducers: {
@@ -80,5 +80,5 @@ const groupSlice = createSlice({
   },
 });
 
-export default groupSlice.reducer;
-export const { resetSplitState } = groupSlice.actions;
+export default splitSlice.reducer;
+export const { resetSplitState } = splitSlice.actions;

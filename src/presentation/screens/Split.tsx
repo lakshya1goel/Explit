@@ -37,20 +37,23 @@ const SplitExpenseScreen = () => {
 
     const handleCreateSplit = async () => {
         try {
-          if (!details.title.trim() || details.amount.trim() === '') {
-            showErrorMessage('Expense title is required');
-            return;
-          }
+            if (!details.title.trim() || details.amount.trim() === '') {
+                showErrorMessage('Expense title is required');
+                return;
+            }
+            if (!details.amount.trim() || isNaN(parseFloat(details.amount.trim())) || parseFloat(details.amount.trim()) <= 0) {
+                    showErrorMessage('Amount must be a valid positive number');
+                    return;
+            }
           const payload: SplitCreationPayload = {
             group_id: groupId,
             amount: parseFloat(details.amount.trim()),
             title: details.title.trim(),
             description: details.desc.trim(),
           };
-          console.log('Group creation payload:', payload);
           await dispatch(createSplit(payload)).unwrap();
         } catch (err) {
-          console.log('Create group error:', err);
+          console.log('Create split error:', err);
           if (typeof err === 'string') {
             showErrorMessage(err);
           } else if (err instanceof Error) {
@@ -68,14 +71,6 @@ const SplitExpenseScreen = () => {
             </View>
             <TextInput
                 style={styles.input}
-                placeholder="Amount"
-                placeholderTextColor="#ABB5B5"
-                keyboardType="numeric"
-                value={details.amount}
-                onChangeText={(text) => setDetails({ ...details, amount: text })}
-            />
-            <TextInput
-                style={styles.input}
                 placeholder="Title"
                 placeholderTextColor="#ABB5B5"
                 value={details.title}
@@ -88,10 +83,15 @@ const SplitExpenseScreen = () => {
                 value={details.desc}
                 onChangeText={(text) => setDetails({ ...details, desc: text })}
             />
+            <TextInput
+                style={styles.input}
+                placeholder="Amount"
+                placeholderTextColor="#ABB5B5"
+                keyboardType="numeric"
+                value={details.amount}
+                onChangeText={(text) => setDetails({ ...details, amount: text })}
+            />
             <View style={styles.buttonBar}>
-            <TouchableOpacity style={styles.actionButton} onPress={() => {}}>
-                <Text style={styles.buttonText}>Cancel</Text>
-            </TouchableOpacity>
             {loading ? (
                 <ActivityIndicator
                     size="large"
@@ -141,20 +141,18 @@ const styles = StyleSheet.create({
         color: '#fff',
     },
     buttonBar: {
-        flexDirection: 'row',
         padding: 10,
         borderTopWidth: 0.5,
         borderTopColor: '#333',
         backgroundColor: '#000',
         alignItems: 'center',
-        justifyContent: 'space-between',
         position: 'absolute',
         bottom: 0,
         width: '100%',
     },
     actionButton: {
-        backgroundColor: theme.colors.secondary[900],
-        width: '50%',
+        backgroundColor: theme.colors.primary[500],
+        width: '100%',
         alignItems: 'center',
         paddingVertical: 8,
         paddingHorizontal: 10,

@@ -88,9 +88,7 @@ const HomeScreen = () => {
                     buttonNegative: 'Cancel',
                 }
             );
-
             console.log('Permission result:', res);
-
             if (res === PermissionsAndroid.RESULTS.GRANTED) {
                 const contacts = await Contacts!.getAll();
                 console.log('Contacts fetched:', contacts.length);
@@ -177,7 +175,7 @@ const HomeScreen = () => {
                                     }}
                                     style={styles.card}>
                                     <View style={styles.avatar}>
-                                        <Text style={styles.avatarText}>→</Text>
+                                        <Text style={styles.avatarText}>{'>'}</Text>
                                     </View>
                                     <Text style={styles.nameText}>More</Text>
                                 </Pressable>
@@ -347,6 +345,7 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 18,
         fontWeight: 'bold',
+        textAlign: 'center',
     },
     nameText: {
         fontWeight: 'bold',
