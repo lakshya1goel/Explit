@@ -16,12 +16,23 @@ import SplitExpenseScreen from '../presentation/screens/Split';
 import HomeScreen from '../presentation/screens/Home';
 import PersonalExpenseScreen from '../presentation/screens/PersonalExpense';
 import CreatePersonalExpenseScreen from '../presentation/screens/CreatePersonalExpense';
+import InviteScreen from '../presentation/screens/InvitationScreen';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
+const linking = {
+    prefixes: ['explit://', 'https://explit.com'],
+    config: {
+        screens: {
+            Invite: 'invite',
+        },
+    },
+};
+
+
 const AppNavigator = () => {
     return (
-        <NavigationContainer>
+        <NavigationContainer linking={linking}>
             <Stack.Navigator screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="Splash" component={SplashScreen} />
                 <Stack.Screen name="Login" component={LoginScreen} />
@@ -37,6 +48,7 @@ const AppNavigator = () => {
                 <Stack.Screen name="GroupSummary" component={GroupSummaryScreen} />
                 <Stack.Screen name="PersonalExpense" component={PersonalExpenseScreen} />
                 <Stack.Screen name="CreatePersonalExpense" component={CreatePersonalExpenseScreen} />
+                <Stack.Screen name="Invite" component={InviteScreen} />
             </Stack.Navigator>
         </NavigationContainer>
     );

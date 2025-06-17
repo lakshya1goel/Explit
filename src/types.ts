@@ -26,4 +26,7 @@ export type RootStackParamList = {
     };
     PersonalExpense: undefined;
     CreatePersonalExpense: undefined;
+    Invite: {
+        groupId: string;
+    };
 }
