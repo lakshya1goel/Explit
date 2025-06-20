@@ -1,4 +1,4 @@
-import { ActivityIndicator, Alert, Image, Linking, PermissionsAndroid, Pressable, StatusBar, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, Linking, PermissionsAndroid, Pressable, StatusBar, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { FlatList, Text } from 'react-native-gesture-handler';
 import theme from '../../styles/theme';
 import { NavigationProp, useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -6,11 +6,14 @@ import { RootStackParamList } from '../../types';
 import Contacts from 'react-native-contacts/src/NativeContacts';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { fetchGroups, resetGroupState } from '../../store/slices/groupSlice';
 import showErrorMessage from '../components/ErrorDialog';
 import ws from '../../services/WebsocketService';
 import { FloatingAction } from 'react-native-floating-action';
+import { SceneMap, TabBar, TabView } from 'react-native-tab-view';
+import { getDailyExpense, getMonthlyExpense, getWeeklyExpense, resetAnalysisState } from '../../store/slices/analysisSlice';
+import { GetDailyAnalysisRequest, GetMonthlyAnalysisRequest, GetWeeklyAnalysisRequest } from '../../store/types/analysis';
 
 const HomeScreen = () => {
     const actions = [
@@ -36,6 +39,90 @@ const HomeScreen = () => {
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
     const dispatch = useDispatch<AppDispatch>();
     const { loading, success, data } = useSelector((state: RootState) => state.group);
+    const {analysisLoading, analysisSuccess, monthly_analysis, weekly_analysis, daily_analysis} = useSelector((state: RootState) => state.analysis);
+
+    const handleFetchMonthlyAnalysis = useCallback(async () => {
+        try {
+            const request: GetMonthlyAnalysisRequest = {
+                month: new Date().getMonth() + 1,
+                year: new Date().getFullYear(),
+            };
+            await dispatch(getMonthlyExpense(request)).unwrap();
+        } catch (err) {
+            console.log('Fetch monthly expense error:', err);
+            if (typeof err === 'string') {
+                showErrorMessage(err);
+            } else if (err instanceof Error) {
+                showErrorMessage(err.message);
+            } else {
+                showErrorMessage('monthly expense fetching failed');
+            }
+        }
+    }, [dispatch]);
+
+    useEffect(() => {
+        handleFetchMonthlyAnalysis();
+    }, [handleFetchMonthlyAnalysis]);
+
+    useEffect(() => {
+        if (analysisSuccess) {
+            dispatch(resetAnalysisState());
+        }
+    }, [analysisSuccess, dispatch]);
+
+    const handleFetchWeeklyAnalysis = useCallback(async () => {
+        try {
+            const today = new Date();
+            const dayOfWeek = today.getDay();
+            const diffToMonday = (dayOfWeek === 1) ? 0 : (dayOfWeek === 0 ? 6 : dayOfWeek - 1);
+            const lastMonday = new Date(today);
+            lastMonday.setDate(today.getDate() - diffToMonday);
+
+            const request: GetWeeklyAnalysisRequest = {
+                week: lastMonday.getDate(),
+                month: lastMonday.getMonth() + 1,
+                year: lastMonday.getFullYear(),
+            };
+            await dispatch(getWeeklyExpense(request)).unwrap();
+        } catch (err) {
+            console.log('Fetch weekly expense error:', err);
+            if (typeof err === 'string') {
+                showErrorMessage(err);
+            } else if (err instanceof Error) {
+                showErrorMessage(err.message);
+            } else {
+                showErrorMessage('weekly expense fetching failed');
+            }
+        }
+    }, [dispatch]);
+
+    useEffect(() => {
+        handleFetchWeeklyAnalysis();
+    }, [handleFetchWeeklyAnalysis]);
+
+    const handleFetchDailyAnalysis = useCallback(async () => {
+        try {
+            const request: GetDailyAnalysisRequest = {
+                day: new Date().getDate(),
+                month: new Date().getMonth() + 1,
+                year: new Date().getFullYear(),
+            };
+            await dispatch(getDailyExpense(request)).unwrap();
+        } catch (err) {
+            console.log('Fetch daily expense error:', err);
+            if (typeof err === 'string') {
+                showErrorMessage(err);
+            } else if (err instanceof Error) {
+                showErrorMessage(err.message);
+            } else {
+                showErrorMessage('daily expense fetching failed');
+            }
+        }
+    }, [dispatch]);
+
+    useEffect(() => {
+        handleFetchDailyAnalysis();
+    }, [handleFetchDailyAnalysis]);
 
     const handleFetcheGroups = useCallback(async () => {
         try {
@@ -114,6 +201,74 @@ const HomeScreen = () => {
         }
     };
 
+    const layout = useWindowDimensions();
+    const [index, setIndex] = useState(0);
+    const [routes] = useState([
+        { key: 'monthly', title: 'Monthly' },
+        { key: 'weekly', title: 'Weekly' },
+        { key: 'daily', title: 'Daily' },
+    ]);
+
+    const MonthlyRoute = () => (
+        <View>
+            <View style={styles.analysisFooter}>
+                <View>
+                    <Text style={styles.amtTextStyle}>Owed by you</Text>
+                    <Text style={styles.amtTextStyle}>Owed to you</Text>
+                    <Text style={styles.amtTextStyle}>Personal expense</Text>
+                </View>
+                <View style={styles.amtStyle}>
+                    <Text style={styles.amtTextStyle}>₹{monthly_analysis?.owed_by_amount}</Text>
+                    <Text style={styles.amtTextStyle}>₹{monthly_analysis?.owed_to_amount}</Text>
+                    <Text style={styles.amtTextStyle}>₹{monthly_analysis?.spent_amount}</Text>
+                </View>
+                <Image source={require('../../../assets/images/analysis.png')} style={styles.img} />
+            </View>
+        </View>
+    );
+
+    const WeeklyRoute = () => (
+        <View>
+            <View style={styles.analysisFooter}>
+                <View>
+                    <Text style={styles.amtTextStyle}>Owed by you</Text>
+                    <Text style={styles.amtTextStyle}>Owed to you</Text>
+                    <Text style={styles.amtTextStyle}>Personal expense</Text>
+                </View>
+                <View style={styles.amtStyle}>
+                    <Text style={styles.amtTextStyle}>₹{weekly_analysis?.owed_by_amount}</Text>
+                    <Text style={styles.amtTextStyle}>₹{weekly_analysis?.owed_to_amount}</Text>
+                    <Text style={styles.amtTextStyle}>₹{weekly_analysis?.spent_amount}</Text>
+                </View>
+                <Image source={require('../../../assets/images/analysis.png')} style={styles.img} />
+            </View>
+        </View>
+    );
+
+    const DailyRoute = () => (
+        <View>
+            <View style={styles.analysisFooter}>
+                <View>
+                    <Text style={styles.amtTextStyle}>Owed by you</Text>
+                    <Text style={styles.amtTextStyle}>Owed to you</Text>
+                    <Text style={styles.amtTextStyle}>Personal expense</Text>
+                </View>
+                <View style={styles.amtStyle}>
+                    <Text style={styles.amtTextStyle}>₹{daily_analysis?.owed_by_amount}</Text>
+                    <Text style={styles.amtTextStyle}>₹{daily_analysis?.owed_to_amount}</Text>
+                    <Text style={styles.amtTextStyle}>₹{daily_analysis?.spent_amount}</Text>
+                </View>
+                <Image source={require('../../../assets/images/analysis.png')} style={styles.img} />
+            </View>
+        </View>
+    );
+
+    const renderScene = SceneMap({
+        monthly: MonthlyRoute,
+        weekly: WeeklyRoute,
+        daily: DailyRoute,
+    });
+
     return (
         <View style={styles.container}>
             <StatusBar backgroundColor={theme.colors.background[700]} barStyle="light-content" />
@@ -121,27 +276,21 @@ const HomeScreen = () => {
                 <Text style={styles.appBarText}>Explit</Text>
             </View>
             <View style={styles.monthlyExpense}>
-                <View style={styles.analysisHeader}>
-                    <Text style={styles.monthlyExpenseHeading}>Analysis</Text>
-                    <View style={styles.analysisTypeConatiner}>
-                        <Text style={styles.analysisTypeText}>Monthly</Text>
-                        <Text style={styles.analysisTypeText}>Weekly</Text>
-                        <Text style={styles.analysisTypeText}>Daily</Text>
-                    </View>
-                </View>
-                <View style={styles.analysisFooter}>
-                    <View>
-                        <Text style={styles.amtTextStyle}>Owed by you</Text>
-                        <Text style={styles.amtTextStyle}>Owed to you</Text>
-                        <Text style={styles.amtTextStyle}>Personal expense</Text>
-                    </View>
-                    <View style={styles.amtStyle}>
-                        <Text style={styles.amtTextStyle}>₹100</Text>
-                        <Text style={styles.amtTextStyle}>₹500</Text>
-                        <Text style={styles.amtTextStyle}>₹10000</Text>
-                    </View>
-                    <Image source={require('../../../assets/images/analysis.png')} style={styles.img}/>
-                </View>
+                <Text style={styles.monthlyExpenseHeading}>Analysis</Text>
+                <TabView
+                    navigationState={{ index, routes }}
+                    renderScene={renderScene}
+                    onIndexChange={setIndex}
+                    initialLayout={{ width: layout.width }}
+                    renderTabBar={props => (
+                        <TabBar
+                            {...props}
+                            indicatorStyle={styles.indicator}
+                            style={styles.analysisTypeText}
+                            tabStyle={styles.tabStyle}
+                        />
+                    )}
+                />
             </View>
             <Pressable style={styles.viewPersonalExpense} onPress={() => {
                 navigation.navigate('PersonalExpense');
@@ -249,14 +398,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    analysisHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: 10,
-    },
     monthlyExpense: {
-        height: 150,
+        height: 200,
         backgroundColor: theme.colors.background[100],
         borderRadius: 20,
         margin: 10,
@@ -266,23 +409,23 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 20,
         margin: 10,
+        paddingHorizontal: 10,
     },
-    analysisTypeConatiner: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginHorizontal: 10,
-        paddingVertical: 10,
+    indicator: {
+        backgroundColor: theme.colors.background[100],
     },
     analysisTypeText: {
         color: '#fff',
-        fontSize: 12,
-        paddingVertical: 4,
-        marginHorizontal: 5,
-        width: 60,
-        borderRadius: 10,
-        backgroundColor: theme.colors.primary[500],
+        backgroundColor: theme.colors.background[100],
         textAlign: 'center',
         textAlignVertical: 'center',
+        marginHorizontal: 5,
+    },
+    tabStyle: {
+        backgroundColor: theme.colors.primary[500],
+        borderRadius: 20,
+        width: 100,
+        marginHorizontal: 5,
     },
     analysisFooter: {
         flexDirection: 'row',

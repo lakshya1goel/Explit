@@ -22,9 +22,11 @@
     "react-native-dotenv": "^3.4.11",
     "react-native-floating-action": "^1.22.0",
     "react-native-gesture-handler": "^2.25.0",
+    "react-native-pager-view": "^6.8.1",
     "react-native-safe-area-context": "^5.4.0",
     "react-native-safe-area-view": "^1.1.1",
     "react-native-snackbar": "^2.9.0",
+    "react-native-tab-view": "^4.1.2",
     "react-redux": "^9.2.0"
   },
   "devDependencies": {
