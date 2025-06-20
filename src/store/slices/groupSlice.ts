@@ -25,6 +25,7 @@ api.interceptors.request.use(
 export const createGroup = createAsyncThunk<GroupCreationResponse, GroupCreationPayload, { rejectValue: string }>(
   'group-create',
   async (details, { rejectWithValue }) => {
+    console.log("base url: ", BASE_URL);
     try {
       const response = await api.post<GroupCreationResponse>('group', details);
 

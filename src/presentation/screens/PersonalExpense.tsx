@@ -1,48 +1,76 @@
-import React from 'react';
-import { View, Text, FlatList, TextInput, Pressable, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useCallback, useEffect } from 'react';
+import { View, Text, FlatList, TextInput, Pressable, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import theme from '../../styles/theme';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../types';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../store';
+import showErrorMessage from '../components/ErrorDialog';
+import { getPersonalExpense, resetPersonalExpenseState } from '../../store/slices/personalExpenseSlice';
 
 const PersonalExpenseScreen = () => {
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+    const dispatch = useDispatch<AppDispatch>();
+    const { loading, success, data } = useSelector((state: RootState) => state.personalExpense);
 
-    const personalExpenses = [
-        { id: '1', name: 'Groceries', descprition: 'from lala sumit', amount: 150, date: '1/10/2024'},
-        { id: '2', name: 'Utilities', descprition: 'from lala sumit', amount: 100, date: '1/10/2024'},
-        { id: '3', name: 'Transport', descprition: 'from lala sumit', amount: 50, date: '1/10/2024'},
-        { id: '4', name: 'Entertainment', descprition: 'from lala sumit', amount: 200, date: '1/10/2024'},
-        { id: '5', name: 'Groceries', descprition: 'from lala sumit', amount: 150, date: '1/10/2024'},
-        { id: '6', name: 'Utilities', descprition: 'from lala sumit', amount: 100, date: '1/10/2024'},
-        { id: '7', name: 'Transport', descprition: 'from lala sumit', amount: 50, date: '1/10/2024'},
-        { id: '8', name: 'Entertainment', descprition: 'from lala sumit', amount: 200, date: '1/10/2024'},
-        { id: '9', name: 'Groceries', descprition: 'from lala sumit', amount: 150, date: '1/10/2024'},
-        { id: '10', name: 'Utilities', descprition: 'from lala sumit', amount: 100, date: '1/10/2024'},
-    ]
+    const handleFetchPesonalExpenses = useCallback(async () => {
+        try {
+            await dispatch(getPersonalExpense()).unwrap();
+        } catch (err) {
+            console.log('Fetch personal expenses error:', err);
+            if (typeof err === 'string') {
+                showErrorMessage(err);
+            } else if (err instanceof Error) {
+                showErrorMessage(err.message);
+            } else {
+                showErrorMessage('Personal Expenses fetching failed');
+            }
+        }
+    }, [dispatch]);
+
+    useEffect(() => {
+        handleFetchPesonalExpenses();
+    }, [handleFetchPesonalExpenses]);
+
+    useEffect(() => {
+        if (success) {
+            dispatch(resetPersonalExpenseState());
+        }
+    }, [success, dispatch]);
+
     return (
         <View style={styles.container}>
             <View style={styles.appBar}>
                 <Text style={styles.appBarText}>Your Expenses</Text>
             </View>
+            {loading ? (
+                <ActivityIndicator
+                    size="large"
+                    color={theme.colors.primary[500]}
+                    style={styles.loadingIndicator}
+                />
+            ) :
             <FlatList
-                data={personalExpenses}
+                data={data}
                 keyExtractor={(item, index) => item.id || index.toString()}
                 contentContainerStyle={styles.listContent}
                 renderItem={({ item }) => {
                     return (
                         <View style={styles.card}>
                             <View>
-                                <Text style={styles.nameText}>{item.name}</Text>
-                                <Text style={styles.descText}>{item.descprition}</Text>
+                                <Text style={styles.nameText}>{item.title}</Text>
+                                <Text style={styles.descText}>{item.description}</Text>
                             </View>
                             <View>
-                                <Text style={styles.descText}>{item.date}</Text>
+                                <Text style={styles.descText}>
+                                    {item.CreatedAt ? new Date(item.CreatedAt).toLocaleDateString() : ''}
+                                </Text>
                                 <Text style={styles.amtText}>₹{item.amount}</Text>
                             </View>
                         </View>
                     );
                 }}
-            />
+            />}
             <View style={styles.buttonBar}>
                 <TouchableOpacity style={styles.actionButton} onPress={() => {navigation.navigate('CreatePersonalExpense')}}>
                     <Text style={styles.buttonText}>Add Expense</Text>
@@ -69,6 +97,11 @@ const PersonalExpenseScreen = () => {
         color: '#fff',
         fontSize: 20,
         fontWeight: 'bold',
+    },
+    loadingIndicator: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     listContent: {
         paddingVertical: 10,

@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
 import { BASE_URL } from '@env';
 import AuthService from '../../services/AuthService';
-import { PersonalExpenseCreationPayload, PersonalExpenseCreationResponse, PersonalExpenseState } from '../types/personalExpense';
+import { GetPersonalExpensesResponse, PersonalExpenseCreationPayload, PersonalExpenseCreationResponse, PersonalExpenseState } from '../types/personalExpense';
 
 const api = axios.create({
     baseURL: BASE_URL,
@@ -44,11 +44,34 @@ export const createPersonalExpense = createAsyncThunk<PersonalExpenseCreationRes
     }
 );
 
+export const getPersonalExpense = createAsyncThunk<GetPersonalExpensesResponse, void, { rejectValue: string }>(
+    'personal-expense-fetch',
+    async (_, { rejectWithValue }) => {
+        try {
+        const response = await api.get<GetPersonalExpensesResponse>('split/personal-expenses');
+
+        if (response.data.success) {
+            return response.data;
+        }
+
+        return rejectWithValue(response.data.message);
+        } catch (error) {
+        if (error instanceof AxiosError) {
+            return rejectWithValue(
+            error.response?.data?.message
+            );
+        }
+        return rejectWithValue('An unexpected error occurred');
+        }
+    }
+);
+
 const initialState: PersonalExpenseState = {
     loading: false,
     error: null,
     success: false,
     message: '',
+    data: [],
 };
 
 const personalExpenseSlice = createSlice({
@@ -76,6 +99,22 @@ const personalExpenseSlice = createSlice({
             state.loading = false;
             state.success = false;
             state.error = action.payload || 'Failed to create personal expense';
+        }).addCase(getPersonalExpense.pending, (state) => {
+            state.loading = true;
+            state.error = null;
+            state.success = false;
+            state.message = '';
+        })
+        .addCase(getPersonalExpense.fulfilled, (state, action) => {
+            state.loading = false;
+            state.success = true;
+            state.data = action.payload.data;
+            state.message = action.payload.message;
+        })
+        .addCase(getPersonalExpense.rejected, (state, action) => {
+            state.loading = false;
+            state.success = false;
+            state.error = action.payload || 'Failed to fetch personal expenses';
         });
     },
 });
