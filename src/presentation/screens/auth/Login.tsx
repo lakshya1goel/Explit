@@ -88,7 +88,6 @@ const LoginScreen = () => {
     };
 
     const handleGoogleLogin = async () => {
-        console.log('Google login clicked');
         try {
             await dispatch(googleSignIn()).unwrap();
         } catch (err) {

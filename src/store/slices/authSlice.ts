@@ -3,9 +3,10 @@ import { AuthResponse, AuthState, LoginCredentials, OtpCredentials, OtpResponse,
 import axios, { AxiosError } from 'axios';
 import { BASE_URL } from '@env';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
+import AuthService from '../../services/AuthService';
 
 const api = axios.create({
-  baseURL: BASE_URL,
+  baseURL: 'https://explit.varankit.me/api/',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -106,6 +107,16 @@ export const verifyMobile = createAsyncThunk<AuthResponse, VerifyMobileCredentia
       const response = await api.post<AuthResponse>('auth/verify-mobile', credentials);
 
       if (response.data.success) {
+        const accessExpTime = new Date();
+          accessExpTime.setDate(accessExpTime.getDate() + 1);
+          const refreshExpTime = new Date();
+          refreshExpTime.setDate(refreshExpTime.getDate() + 30);
+          await AuthService.storeToken({
+              accessToken: response.data.data.access_token,
+              refreshToken: response.data.data.refresh_token,
+              accessExpTime: accessExpTime.getTime(),
+              refreshExpTime: refreshExpTime.getTime(),
+          });
         return response.data;
       }
 
@@ -196,7 +207,7 @@ const authSlice = createSlice({
       state.isOtpSent = true;
     }).addCase(register.rejected, (state, action) =>{
       state.loading = false;
-      state.error = action.payload || 'Register Failed';
+      state.error = action.payload || 'Signup Failed';
     }).addCase(verifyEmail.pending, (state) => {
       state.loading = true;
       state.error = null;
@@ -211,7 +222,7 @@ const authSlice = createSlice({
       state.error = null;
     }).addCase(verifyMobile.fulfilled, (state) => {
       state.loading = false;
-      state.isEmailVerified = true;
+      state.isMobileVerified = true;
     }).addCase(verifyMobile.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload || 'Mobile Verification Failed';

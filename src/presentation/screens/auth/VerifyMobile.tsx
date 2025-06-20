@@ -8,7 +8,6 @@ import { RootStackParamList } from '../../../types';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../store';
 import { verifyMobile } from '../../../store/slices/authSlice';
-import AuthService from '../../../services/AuthService';
 import showErrorMessage from '../../components/ErrorDialog';
 import showSuccessMessage from '../../components/SuccessDialog';
 
@@ -20,23 +19,12 @@ const VerifyMobileScreen = () => {
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const inputRefs = useRef<Array<TextInput | null>>(new Array(6).fill(null));
 
-    const { loading, isMobileVerified, accessToken, refreshToken} = useSelector((state: RootState) => state.auth);
-    console.log(mobile);
+    const { loading, isMobileVerified} = useSelector((state: RootState) => state.auth);
 
     useEffect(() => {
-        if (isMobileVerified && accessToken && refreshToken) {
+        if (isMobileVerified) {
             const saveTokens = async () => {
                 try {
-                    const accessExpTime = new Date();
-                    accessExpTime.setDate(accessExpTime.getDate() + 1);
-                    const refreshExpTime = new Date();
-                    refreshExpTime.setDate(refreshExpTime.getDate() + 30);
-                    await AuthService.storeToken({
-                        accessToken: accessToken,
-                        refreshToken: refreshToken,
-                        accessExpTime: accessExpTime.getTime(),
-                        refreshExpTime: refreshExpTime.getTime(),
-                    });
                     showSuccessMessage('Mobile Verified!');
                     navigation.navigate('Home');
                 } catch (error) {
@@ -45,7 +33,7 @@ const VerifyMobileScreen = () => {
             };
             saveTokens();
         }
-    }, [isMobileVerified, navigation, accessToken, refreshToken]);
+    }, [isMobileVerified, navigation]);
 
     const handleVerifyMobile = async () => {
         try {
@@ -55,7 +43,8 @@ const VerifyMobileScreen = () => {
                 return;
             }
 
-            await dispatch(verifyMobile({ mobile, otp: otpString })).unwrap();
+            const trimmedMobile = mobile.trim().replace(/\D/g, '').slice(-10);
+            await dispatch(verifyMobile({ mobile: trimmedMobile, otp: otpString })).unwrap();
         } catch (err) {
             if (typeof err === 'string') {
                 showErrorMessage(err);

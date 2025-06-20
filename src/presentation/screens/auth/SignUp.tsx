@@ -41,19 +41,15 @@ const SignUpScreen = () => {
             showErrorMessage('Please enter a valid email');
             return false;
         }
-        if (!/^\d+$/.test(credentials.mobile)) {
-            showErrorMessage('Mobile number must be numeric');
-            return false;
-        }
-        if (credentials.mobile.length !== 10) {
-            showErrorMessage('Mobile number must be of 10 digits');
+        if (credentials.mobile.length < 10) {
+            showErrorMessage('Please enter a valid 10-digit mobile number');
             return false;
         }
         if (credentials.password.length < 6) {
             showErrorMessage('Password must be at least 6 characters');
             return false;
         }
-        if (credentials.password !== credentials.confirm_password) {
+        if (credentials.password.trim() !== credentials.confirm_password.trim()) {
             showErrorMessage('Passwords do not match');
             return false;
         }
@@ -62,15 +58,21 @@ const SignUpScreen = () => {
 
     const handleRegister = async () => {
         try {
-            if (!validateForm()) {return;}
-            await dispatch(register(credentials)).unwrap();
+            const trimmedCredentials = {
+                email: credentials.email.trim(),
+                mobile: credentials.mobile.trim().replace(/\D/g, '').slice(-10),
+                password: credentials.password.trim(),
+                confirm_password: credentials.confirm_password.trim(),
+            };
+            if (!validateForm()) { return; }
+            await dispatch(register(trimmedCredentials)).unwrap();
         } catch (err) {
             if (typeof err === 'string') {
                 showErrorMessage(err);
             } else if (err instanceof Error) {
                 showErrorMessage(err.message);
             } else {
-                showErrorMessage('Login failed');
+                showErrorMessage('Signup failed');
             }
         }
     };
